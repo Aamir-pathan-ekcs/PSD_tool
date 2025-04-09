@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Container, Row, Col, Card, Button, Modal } from 'react-bootstrap';
 
 export default function Home() {
   const [file, setFile] = useState(null);
@@ -37,6 +38,10 @@ export default function Home() {
     setFile(e.target.files[0]);
     setError("");
   };
+  const [showModal, setShowModal] = useState(false);
+
+  const handleShow = () => setShowModal(true);
+  const handleClose = () => setShowModal(false);
 
   const handleUpload = async () => {
     if (!file) {
@@ -92,57 +97,72 @@ export default function Home() {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
-      <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>
-        PSD to HTML Converter
-      </h1>
-      <div style={{ marginBottom: "20px" }}>
-        <input
-          type="file"
-          accept=".zip"
-          onChange={handleFileChange}
-          style={{ marginRight: "10px" }}
-        />
-        <button
-          onClick={handleUpload}
-          disabled={isLoading}
-          style={{
-            padding: "8px 16px",
-            backgroundColor: isLoading ? "#ccc" : "#0070f3",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: isLoading ? "not-allowed" : "pointer",
-          }}
-        >
-          {isLoading ? "Converting..." : "Convert PSD"}
-        </button>
-      </div>
-      {error && <p style={{ color: "red", marginBottom: "20px" }}>{error}</p>}
-
-      {/* Display HTML previews grouped by folder */}
-      <h2 style={{ fontSize: "20px", marginTop: "20px" }}>Converted HTML Previews</h2>
-      {Object.keys(htmlFiles).length > 0 ? (
-        Object.keys(htmlFiles).map((folder) => (
-          <div key={folder} style={{ marginBottom: "30px" }}>
-            <h3 style={{ fontSize: "18px", marginBottom: "10px" }}>{folder}</h3>
-            <div style={{ display: "grid", gap: "20px" }}>
-              {htmlFiles[folder].map((htmlFile, index) => (
-                <div key={index} style={{ border: "1px solid #ccc", padding: "10px" }}>
-                  <h4>{htmlFile.name}</h4>
-                  <iframe
-                    src={htmlFile.url}
-                    style={{ width: "100%", height: "300px", border: "none" }}
-                    title={`Preview of ${htmlFile.name}`}
-                  />
-                </div>
-              ))}
+    
+    <div className="container">
+      <div className="d-flex justify-content-center">
+        <div className="card col-6 m-5 text-center">
+          <div className="card-header">
+            <h3>PSD to HTML Converter</h3>
+          </div>
+          <div className="card-body">
+            <div>
+              <input className="form-control" type="file" accept=".zip"
+                onChange={handleFileChange}
+                style={{ marginRight: "10px" }}
+              />
+              <button
+                onClick={handleUpload}
+                disabled={isLoading}
+                className="btn btn-primary btn-block mt-3"
+              >
+                {isLoading ? "Converting..." : "Convert PSD"}
+              </button>
             </div>
           </div>
-        ))
-      ) : (
-        <p>No HTML files available. Convert a PSD to see previews.</p>
-      )}
+          
+          <button
+                disabled={Object.keys(htmlFiles).length === 0}
+                className="btn btn-secondary btn-block m-3" onClick={handleShow}
+              >
+                {Object.keys(htmlFiles).length > 0 ? "Preview All ads" : "Preview Not Generated"}
+              </button>
+          {error && <p style={{ color: "red", marginBottom: "20px" }}>{error}</p>}
+        </div>
+      </div>
+
+      <Modal show={showModal} onHide={handleClose} size="xl">
+        <Modal.Header closeButton>
+          <Modal.Title>HTML Previews</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center">
+          {Object.keys(htmlFiles).map((folder) => {
+            const match = folder.match(/_(\d+)x(\d+)$/);
+            const width = match ? parseInt(match[1], 10) : 300;
+            const height = match ? parseInt(match[2], 10) : 300;
+
+            return (
+              <div key={folder} className="text-center mb-4">
+                <h5 className="pb-2">{folder}</h5>
+                  {htmlFiles[folder].map((htmlFile, index) => (
+                          <iframe
+                            src={htmlFile.url}
+                            width={width}
+                            height={height}
+                            title={`Preview of ${htmlFile.name}`}
+                          />
+                  ))}
+                
+              </div>
+            );
+          })}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      
     </div>
   );
 }

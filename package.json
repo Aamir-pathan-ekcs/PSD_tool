@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "bootstrap": "^5.3.5",
     "child-process-promise": "^2.2.1",
     "file-saver": "^2.0.5",
     "googleapis": "^148.0.0",
@@ -16,6 +17,7 @@
     "next": "15.2.4",
     "react": "^19.0.0",
     "react-ace": "^14.0.1",
+    "react-bootstrap": "^2.10.9",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
