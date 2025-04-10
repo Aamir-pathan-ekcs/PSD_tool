@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [htmlFiles, setHtmlFiles] = useState({});
+  const router = useRouter();
 
   // Fetch HTML files from the output folder
   useEffect(() => {
@@ -93,9 +95,7 @@ export default function Home() {
 
   return (
     <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
-      <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>
-        PSD to HTML Converter
-      </h1>
+      <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>PSD to HTML Converter</h1>
       <div style={{ marginBottom: "20px" }}>
         <input
           type="file"
@@ -117,10 +117,23 @@ export default function Home() {
         >
           {isLoading ? "Converting..." : "Convert PSD"}
         </button>
+        <button
+          onClick={() => router.push("/edit")}
+          style={{
+            padding: "8px 16px",
+            backgroundColor: "#28a745",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            marginLeft: "10px",
+            cursor: "pointer",
+          }}
+        >
+          Edit HTML
+        </button>
       </div>
       {error && <p style={{ color: "red", marginBottom: "20px" }}>{error}</p>}
-
-      {/* Display HTML previews grouped by folder */}
+  
       <h2 style={{ fontSize: "20px", marginTop: "20px" }}>Converted HTML Previews</h2>
       {Object.keys(htmlFiles).length > 0 ? (
         Object.keys(htmlFiles).map((folder) => (
@@ -134,6 +147,7 @@ export default function Home() {
                     src={htmlFile.url}
                     style={{ width: "100%", height: "300px", border: "none" }}
                     title={`Preview of ${htmlFile.name}`}
+                    sandbox="allow-same-origin allow-scripts"
                   />
                 </div>
               ))}

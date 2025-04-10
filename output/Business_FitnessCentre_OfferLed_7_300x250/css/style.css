@@ -1,0 +1,149 @@
+* {
+                        margin: 0px;
+                        padding: 0px;
+                        box-sizing: border-box;
+                    }
+
+                    :root {
+                        --width: 300px;
+                        --height: 250px;
+                    }
+                    
+
+                    .container {
+                        width: 300px;
+                        height: 250px;
+                        position: relative;
+                        overflow: hidden;
+                        border: 1px solid #7a8599;
+                        background-color: rgb(203, 66, 44);
+                    }
+                    
+   .clicktru {
+                        z-index:9999; width:100%; height:100%; position:absolute;
+                    }
+
+                        a{
+                            text-decoration:none;
+                    } 
+
+                        #sd_btn_Click-Through-URL:empty{display:none;} 
+                    
+
+                        .contentSection {
+                            width: 175px;
+                            height: 179px;
+                            position: relative;
+                            left: 126px;
+                            top: 72px;
+                            overflow: hidden;
+                        }
+                                    
+
+                                    .imageBox {
+                                        width: 149px;
+                                        height: 249px;
+                                        position: absolute;
+                                        left: -1px;
+                                        top: -1px;
+                                        z-index: 1;
+                                        overflow: hidden;
+                                        border-radius: initial;
+                                        clip-path: inherit;
+                                        -webkit-clip-path: inherit
+                                    }
+                                    .imageBox img {
+                                        width: 149px;
+                                        height: 249px;
+                                        object-fit: cover;
+                                    }
+                                
+.cta {
+    width: auto;
+    display: flex;
+    position: absolute;
+    left: 42px;
+    top: 130px;
+    text-align: center;
+}
+.button {
+    min-width: 108px;
+    max-width: 110.00px;
+    max-height: 31px;
+    font-size: 14.02px;
+    font-family: 'Exo', serif;
+    font-weight: 700;
+    font-style: normal;
+    cursor: pointer;
+    color: rgb(255, 255, 255);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(7, 28, 55, 255);
+    padding: 0.5em 0.65em 0.51em;
+    text-align: center;
+    line-height: 1.2em;
+    border-radius: 0.00em;
+}
+
+                                .subHeading1,.subHeading2,.subHeading3 {
+                                    width: 107px;
+                                    height: 118px;
+                                    position: absolute;
+                                    left: 42px;
+                                    top: 4px;
+                                    font-family: 'Exo', serif;
+                                    font-weight: 500;
+                                    font-style: normal;
+                                    font-size: 15.01px;
+                                    color: rgb(255, 255, 255);
+                                    line-height: 1.0em;
+                                    text-align: center;
+                                }
+                                        
+
+                                .mainHeading {
+                                    width: 109px;
+                                    height: 102px;
+                                    position: absolute;
+                                    left: 41px;
+                                    top: 28px;
+                                    font-family: 'Exo', serif;
+                                    font-weight: 800;
+                                    font-style: normal;
+                                    font-size: 22.00px;
+                                    color: rgb(255, 255, 255);
+                                    line-height: 1.2em;
+                                    text-align: center;
+                                }
+                                        
+
+                            .shape1 {
+                                width: 292px;
+                                height: 242px;
+                                position: absolute;
+                                left: 3px;
+                                top: 3px;
+                                background-color: rgb(34, 34, 34, 255);
+                                border-radius: initial;
+                                clip-path: polygon(0px 2px, 1px 242px, 292px 242px, 291px 0px);
+                                -webkit-clip-path: polygon(0px 2px, 1px 242px, 292px 242px, 291px 0px)
+                            
+                            }
+                                        
+
+                            .logo {
+                                width: 117px;
+                                height: 51px;
+                                position: absolute;
+                                left: 161px;
+                                top: 13px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: flex-start;
+                            }
+                            .logo img{
+                                max-width: 117px;
+                                max-height: 51px;
+                            }
+                            
