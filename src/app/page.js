@@ -96,6 +96,21 @@ export default function Home() {
     }
   };
 
+  const handleCleanFolder = async () => {
+    try {
+      const res = await fetch("/api/clear-output", {
+        method: "POST",
+      });
+  
+      const data = await res.json();
+      setHtmlFiles({});
+      alert(data.message || "Cleaned successfully");
+    } catch (err) {
+      console.error("Failed to clean folder:", err);
+      alert("Failed to clean folder");
+    }
+  };
+
   return (
     
     <div className="container">
@@ -122,10 +137,14 @@ export default function Home() {
           
           <button
                 disabled={Object.keys(htmlFiles).length === 0}
-                className="btn btn-secondary btn-block m-3" onClick={handleShow}
+                className="btn btn-success btn-block m-3" onClick={handleShow}
               >
                 {Object.keys(htmlFiles).length > 0 ? "Preview All ads" : "Preview Not Generated"}
               </button>
+
+              <Button className="m-3" variant="danger" onClick={handleCleanFolder} disabled={Object.keys(htmlFiles).length === 0}>
+  Clean Output Folder
+</Button>
           {error && <p style={{ color: "red", marginBottom: "20px" }}>{error}</p>}
         </div>
       </div>
@@ -141,17 +160,17 @@ export default function Home() {
             const height = match ? parseInt(match[2], 10) : 300;
 
             return (
-              <div key={folder} className="text-center mb-4">
+              <div key={folder} className="text-center mb-3">
                 <h5 className="pb-2">{folder}</h5>
                   {htmlFiles[folder].map((htmlFile, index) => (
-                          <iframe
+                          <iframe key={index}
                             src={htmlFile.url}
                             width={width}
                             height={height}
                             title={`Preview of ${htmlFile.name}`}
                           />
                   ))}
-                
+                <hr></hr>
               </div>
             );
           })}
