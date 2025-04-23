@@ -12,6 +12,7 @@
     "child-process-promise": "^2.2.1",
     "file-saver": "^2.0.5",
     "googleapis": "^148.0.0",
+    "jsdom": "^26.1.0",
     "jszip": "^3.10.1",
     "next": "15.2.4",
     "react": "^19.0.0",

@@ -1,0 +1,153 @@
+* {
+                        margin: 0px;
+                        padding: 0px;
+                        box-sizing: border-box;
+                    }
+
+                    :root {
+                        --width: 320px;
+                        --height: 520px;
+                    }
+                    
+
+                    .container {
+                        width: 320px;
+                        height: 520px;
+                        position: relative;
+                        overflow: hidden;
+                        border: 1px solid #7a8599;
+                        background-color: rgb(236, 246, 255);
+                    }
+                    
+   .clicktru {
+                        z-index:9999; width:100%; height:100%; position:absolute;
+                    }
+
+                        a{
+                            text-decoration:none;
+                    } 
+
+                        #sd_btn_Click-Through-URL:empty{display:none;} 
+                    
+
+                        .contentSection {
+                            width: 325px;
+                            height: 178px;
+                            position: relative;
+                            left: -3px;
+                            top: 343px;
+                            overflow: hidden;
+                        }
+                                    
+
+                            .shape1 {
+                                width: 324px;
+                                height: 274px;
+                                position: absolute;
+                                left: -3px;
+                                top: 0px;
+                                background-color: rgb(91, 176, 255, 255);
+                                border-radius: initial;
+                                clip-path: polygon(323px 1px, 49px 9px, 3px 39px, 0px 273px, 278px 266px, 321px 235px);
+                                -webkit-clip-path: polygon(323px 1px, 49px 9px, 3px 39px, 0px 273px, 278px 266px, 321px 235px)
+                            
+                            }
+                                        
+
+                                    .imageBox {
+                                        width: 324px;
+                                        height: 271px;
+                                        position: absolute;
+                                        left: -3px;
+                                        top: -1px;
+                                        z-index: 1;
+                                        overflow: hidden;
+                                        border-radius: initial;
+                                        clip-path: polygon(326.0px 2.0px, 48.0px 21.0px, 3.0px 49.0px, 0.0px 271.0px, 279.0px 252.0px, 323.0px 226.0px);
+                                        -webkit-clip-path: polygon(326.0px 2.0px, 48.0px 21.0px, 3.0px 49.0px, 0.0px 271.0px, 279.0px 252.0px, 323.0px 226.0px)
+                                    }
+                                    .imageBox img {
+                                        width: 324px;
+                                        height: 271px;
+                                        object-fit: cover;
+                                    }
+                                
+
+                                .mainHeading {
+                                    width: 216px;
+                                    height: 53px;
+                                    position: absolute;
+                                    left: 55px;
+                                    top: 47px;
+                                    font-family: 'OpenSans', serif;
+                                    font-weight: 800;
+                                    font-style: normal;
+                                    font-size: 27.64px;
+                                    color: rgb(0, 0, 0);
+                                    line-height: 1.19em;
+                                    display: flex;
+                                    align-items: center;
+                                    text-align: center;
+                                }
+                                        
+
+                                .subHeading1,.subHeading2,.subHeading3 {
+                                    width: 220px;
+                                    height: 85px;
+                                    position: absolute;
+                                    left: 53px;
+                                    top: 15px;
+                                    font-family: 'OpenSans', serif;
+                                    font-weight: 400;
+                                    font-style: normal;
+                                    font-size: 15.56px;
+                                    color: rgb(33, 33, 33);
+                                    line-height: 1.11em;
+                                    display: flex;
+                                    align-items: center;
+                                    text-align: center;
+                                }
+                                        
+.cta {
+    width: 319px;
+    display: flex;
+    position: absolute;
+    left: 0px;
+    top: 112px;
+    justify-content: center;
+}
+.button {
+    min-width: 124px;
+    max-width: 255.20px;
+    max-height: 36px;
+    font-size: 13.84px;
+    font-family: 'OpenSans', serif;
+    font-weight: 700;
+    font-style: normal;
+    cursor: pointer;
+    color: rgb(255, 255, 255);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(91, 176, 255, 255);
+    padding: 0.5em 0.65em 0.51em;
+    text-align: center;
+    line-height: 1.2em;
+    border-radius: 0.00em;
+}
+
+                            .logo {
+                                width: 190px;
+                                height: 61px;
+                                position: absolute;
+                                left: 63px;
+                                top: 277px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                            }
+                            .logo img{
+                                max-width: 190px;
+                                max-height: 61px;
+                            }
+                            

@@ -1,0 +1,153 @@
+* {
+                        margin: 0px;
+                        padding: 0px;
+                        box-sizing: border-box;
+                    }
+
+                    :root {
+                        --width: 960px;
+                        --height: 250px;
+                    }
+                    
+
+                    .container {
+                        width: 960px;
+                        height: 250px;
+                        position: relative;
+                        overflow: hidden;
+                        border: 1px solid #7a8599;
+                        background-color: rgb(245, 245, 245);
+                    }
+                    
+   .clicktru {
+                        z-index:9999; width:100%; height:100%; position:absolute;
+                    }
+
+                        a{
+                            text-decoration:none;
+                    } 
+
+                        #sd_btn_Click-Through-URL:empty{display:none;} 
+                    
+
+                            .shape1 {
+                                width: 375px;
+                                height: 316px;
+                                position: absolute;
+                                left: 201px;
+                                top: -33px;
+                                background-color: rgb(34, 34, 34, 255);
+                                border-radius: initial;
+                                clip-path: polygon(251.34px 268.11px, 241.55px 273.46px, 231.55px 278.34px, 221.37px 282.75px, 211.06px 286.67px, 200.66px 290.08px, 190.21px 292.97px, 179.76px 295.33px, 169.33px 297.14px, 158.98px 298.40px, 148.74px 299.11px, 138.66px 299.26px, 128.77px 298.86px, 119.11px 297.90px, 109.73px 296.38px, 100.66px 294.32px, 91.93px 291.72px, 83.58px 288.59px, 75.64px 284.95px, 68.14px 280.81px, 61.12px 276.18px, 54.60px 271.08px, 48.60px 265.54px, 43.16px 259.57px, 38.28px 253.20px, 34.00px 246.46px, 30.32px 239.36px, 27.27px 231.95px, 24.85px 224.24px, 23.08px 216.27px, 21.95px 208.07px, 21.48px 199.67px, 21.67px 191.11px, 22.51px 182.42px, 24.01px 173.63px, 26.16px 164.77px, 28.94px 155.89px, 32.35px 147.02px, 36.37px 138.19px, 41.00px 129.44px, 46.20px 120.80px, 51.96px 112.31px, 58.26px 104.00px, 65.07px 95.90px, 72.37px 88.05px, 80.12px 80.47px, 88.30px 73.19px, 96.87px 66.26px, 105.80px 59.68px, 115.05px 53.49px, 124.60px 47.71px, 134.39px 42.37px, 144.39px 37.48px, 154.57px 33.07px, 164.88px 29.15px, 175.28px 25.74px, 185.73px 22.85px, 196.18px 20.50px, 206.61px 18.69px, 216.96px 17.42px, 227.20px 16.71px, 237.28px 16.56px, 247.17px 16.97px, 256.83px 17.93px, 266.21px 19.44px, 275.28px 21.50px, 284.01px 24.10px, 292.36px 27.23px, 300.30px 30.87px, 307.80px 35.02px, 314.82px 39.65px, 321.34px 44.74px, 327.34px 50.29px, 332.78px 56.25px, 337.66px 62.62px, 341.94px 69.37px, 345.62px 76.46px, 348.67px 83.88px, 351.09px 91.58px, 352.86px 99.55px, 353.99px 107.75px, 354.46px 116.15px, 354.27px 124.72px, 353.43px 133.41px, 351.93px 142.20px, 349.78px 151.05px, 347.00px 159.93px, 343.59px 168.80px, 339.57px 177.63px, 334.95px 186.38px, 329.74px 195.02px, 323.98px 203.51px, 317.68px 211.83px, 310.87px 219.92px, 303.57px 227.78px, 295.82px 235.36px, 287.64px 242.63px, 279.07px 249.57px, 270.14px 256.15px, 260.89px 262.34px);
+                                -webkit-clip-path: polygon(251.34px 268.11px, 241.55px 273.46px, 231.55px 278.34px, 221.37px 282.75px, 211.06px 286.67px, 200.66px 290.08px, 190.21px 292.97px, 179.76px 295.33px, 169.33px 297.14px, 158.98px 298.40px, 148.74px 299.11px, 138.66px 299.26px, 128.77px 298.86px, 119.11px 297.90px, 109.73px 296.38px, 100.66px 294.32px, 91.93px 291.72px, 83.58px 288.59px, 75.64px 284.95px, 68.14px 280.81px, 61.12px 276.18px, 54.60px 271.08px, 48.60px 265.54px, 43.16px 259.57px, 38.28px 253.20px, 34.00px 246.46px, 30.32px 239.36px, 27.27px 231.95px, 24.85px 224.24px, 23.08px 216.27px, 21.95px 208.07px, 21.48px 199.67px, 21.67px 191.11px, 22.51px 182.42px, 24.01px 173.63px, 26.16px 164.77px, 28.94px 155.89px, 32.35px 147.02px, 36.37px 138.19px, 41.00px 129.44px, 46.20px 120.80px, 51.96px 112.31px, 58.26px 104.00px, 65.07px 95.90px, 72.37px 88.05px, 80.12px 80.47px, 88.30px 73.19px, 96.87px 66.26px, 105.80px 59.68px, 115.05px 53.49px, 124.60px 47.71px, 134.39px 42.37px, 144.39px 37.48px, 154.57px 33.07px, 164.88px 29.15px, 175.28px 25.74px, 185.73px 22.85px, 196.18px 20.50px, 206.61px 18.69px, 216.96px 17.42px, 227.20px 16.71px, 237.28px 16.56px, 247.17px 16.97px, 256.83px 17.93px, 266.21px 19.44px, 275.28px 21.50px, 284.01px 24.10px, 292.36px 27.23px, 300.30px 30.87px, 307.80px 35.02px, 314.82px 39.65px, 321.34px 44.74px, 327.34px 50.29px, 332.78px 56.25px, 337.66px 62.62px, 341.94px 69.37px, 345.62px 76.46px, 348.67px 83.88px, 351.09px 91.58px, 352.86px 99.55px, 353.99px 107.75px, 354.46px 116.15px, 354.27px 124.72px, 353.43px 133.41px, 351.93px 142.20px, 349.78px 151.05px, 347.00px 159.93px, 343.59px 168.80px, 339.57px 177.63px, 334.95px 186.38px, 329.74px 195.02px, 323.98px 203.51px, 317.68px 211.83px, 310.87px 219.92px, 303.57px 227.78px, 295.82px 235.36px, 287.64px 242.63px, 279.07px 249.57px, 270.14px 256.15px, 260.89px 262.34px)
+                            
+                            }
+                                        
+
+                        .contentSection {
+                            width: 419px;
+                            height: 253px;
+                            position: relative;
+                            left: 553px;
+                            top: -2px;
+                            overflow: hidden;
+                        }
+                                    
+
+                                    .imageBox {
+                                        width: 373px;
+                                        height: 314px;
+                                        position: absolute;
+                                        left: 201px;
+                                        top: -33px;
+                                        z-index: 1;
+                                        overflow: hidden;
+                                        border-radius: initial;
+                                        clip-path: polygon(125.5px 266.5px, 121.7px 264.3px, 118.1px 262.1px, 114.4px 259.8px, 110.8px 257.4px, 107.3px 255.0px, 103.8px 252.5px, 100.3px 249.9px, 96.9px 247.3px, 93.6px 244.7px, 90.3px 242.0px, 87.1px 239.2px, 83.9px 236.4px, 80.8px 233.5px, 77.8px 230.6px, 74.8px 227.7px, 71.9px 224.7px, 69.1px 221.7px, 66.3px 218.6px, 63.7px 215.5px, 61.0px 212.3px, 58.5px 209.2px, 56.1px 206.0px, 53.7px 202.7px, 51.4px 199.5px, 49.2px 196.2px, 47.0px 192.9px, 45.0px 189.6px, 43.0px 186.2px, 41.2px 182.9px, 39.4px 179.5px, 37.7px 176.1px, 36.1px 172.7px, 34.6px 169.3px, 33.2px 165.9px, 31.8px 162.4px, 30.6px 159.0px, 29.5px 155.6px, 28.4px 152.2px, 27.5px 148.7px, 26.6px 145.3px, 25.9px 141.9px, 25.2px 138.5px, 24.7px 135.1px, 24.2px 131.8px, 23.8px 128.4px, 23.6px 125.1px, 23.4px 121.8px, 23.4px 118.5px, 23.4px 115.2px, 23.5px 111.9px, 23.8px 108.7px, 24.1px 105.5px, 24.5px 102.4px, 25.1px 99.2px, 25.7px 96.2px, 26.4px 93.1px, 27.3px 90.1px, 28.2px 87.1px, 29.2px 84.2px, 30.3px 81.3px, 31.5px 78.5px, 32.8px 75.7px, 34.2px 72.9px, 35.7px 70.2px, 37.3px 67.6px, 39.0px 65.0px, 40.7px 62.5px, 42.6px 60.0px, 44.5px 57.6px, 46.5px 55.3px, 48.6px 53.0px, 50.8px 50.8px, 53.1px 48.6px, 55.5px 46.5px, 57.9px 44.5px, 60.4px 42.5px, 63.0px 40.6px, 65.7px 38.8px, 68.4px 37.1px, 71.2px 35.4px, 74.1px 33.8px, 77.1px 32.3px, 80.1px 30.8px, 83.2px 29.4px, 86.3px 28.1px, 89.5px 26.9px, 92.8px 25.8px, 96.1px 24.7px, 99.5px 23.8px, 102.9px 22.9px, 106.4px 22.0px, 110.0px 21.3px, 113.5px 20.7px, 117.2px 20.1px, 120.8px 19.6px, 124.5px 19.2px, 128.3px 18.9px, 132.1px 18.6px, 135.9px 18.5px, 139.7px 18.4px, 143.6px 18.4px, 147.5px 18.5px, 151.4px 18.7px, 155.4px 19.0px, 159.4px 19.3px, 163.4px 19.8px, 167.4px 20.3px, 171.4px 20.9px, 175.4px 21.6px, 179.4px 22.4px, 183.5px 23.2px, 187.5px 24.1px, 191.5px 25.1px, 195.6px 26.2px, 199.6px 27.4px, 203.6px 28.7px, 207.7px 30.0px, 211.7px 31.4px, 215.7px 32.9px, 219.6px 34.4px, 223.6px 36.1px, 227.5px 37.8px, 231.4px 39.5px, 235.3px 41.4px, 239.2px 43.3px, 243.0px 45.3px, 246.8px 47.3px, 250.5px 49.5px, 254.3px 51.6px, 257.9px 53.9px, 261.6px 56.2px, 265.2px 58.6px, 268.7px 61.0px, 272.2px 63.5px, 275.7px 66.1px, 279.0px 68.7px, 282.4px 71.3px, 285.7px 74.0px, 288.9px 76.8px, 292.1px 79.6px, 295.2px 82.5px, 298.2px 85.4px, 301.2px 88.3px, 304.1px 91.3px, 306.9px 94.3px, 309.6px 97.4px, 312.3px 100.5px, 314.9px 103.6px, 317.5px 106.8px, 319.9px 110.0px, 322.3px 113.2px, 324.6px 116.5px, 326.8px 119.8px, 328.9px 123.1px, 331.0px 126.4px, 333.0px 129.8px, 334.8px 133.1px, 336.6px 136.5px, 338.3px 139.9px, 339.9px 143.3px, 341.4px 146.7px, 342.8px 150.1px, 344.2px 153.6px, 345.4px 157.0px, 346.5px 160.4px, 347.6px 163.8px, 348.5px 167.2px, 349.4px 170.7px, 350.1px 174.1px, 350.8px 177.5px, 351.3px 180.9px, 351.8px 184.2px, 352.1px 187.6px, 352.4px 190.9px, 352.6px 194.2px, 352.6px 197.5px, 352.6px 200.8px, 352.5px 204.1px, 352.2px 207.3px, 351.9px 210.5px, 351.4px 213.6px, 350.9px 216.7px, 350.3px 219.8px, 349.6px 222.9px, 348.7px 225.9px, 347.8px 228.9px, 346.8px 231.8px, 345.7px 234.7px, 344.5px 237.5px, 343.2px 240.3px, 341.8px 243.1px, 340.3px 245.8px, 338.7px 248.4px, 337.0px 251.0px, 335.3px 253.5px, 333.4px 256.0px, 331.5px 258.4px, 329.5px 260.7px, 327.3px 263.0px, 325.2px 265.2px, 322.9px 267.4px, 320.5px 269.5px, 318.1px 271.5px, 315.6px 273.5px, 313.0px 275.4px, 310.3px 277.2px, 307.6px 278.9px, 304.8px 280.6px, 301.9px 282.2px, 298.9px 283.7px, 295.9px 285.2px, 292.8px 286.6px, 289.7px 287.8px, 286.5px 289.1px, 283.2px 290.2px, 279.9px 291.3px, 276.5px 292.2px, 273.1px 293.1px, 269.6px 294.0px, 266.0px 294.7px, 262.5px 295.3px, 258.8px 295.9px, 255.2px 296.4px, 251.5px 296.8px, 247.7px 297.1px, 243.9px 297.3px, 240.1px 297.5px, 236.3px 297.6px, 232.4px 297.6px, 228.5px 297.4px, 224.5px 297.3px, 220.6px 297.0px, 216.6px 296.6px, 212.6px 296.2px, 208.6px 295.7px, 204.6px 295.1px, 200.6px 294.4px, 196.6px 293.6px, 192.5px 292.8px, 188.5px 291.9px, 184.4px 290.8px, 180.4px 289.8px, 176.4px 288.6px, 172.3px 287.3px, 168.3px 286.0px, 164.3px 284.6px, 160.3px 283.1px, 156.4px 281.6px, 152.4px 279.9px, 148.5px 278.2px, 144.6px 276.5px, 140.7px 274.6px, 136.8px 272.7px, 133.0px 270.7px, 129.2px 268.7px);
+                                        -webkit-clip-path: polygon(125.5px 266.5px, 121.7px 264.3px, 118.1px 262.1px, 114.4px 259.8px, 110.8px 257.4px, 107.3px 255.0px, 103.8px 252.5px, 100.3px 249.9px, 96.9px 247.3px, 93.6px 244.7px, 90.3px 242.0px, 87.1px 239.2px, 83.9px 236.4px, 80.8px 233.5px, 77.8px 230.6px, 74.8px 227.7px, 71.9px 224.7px, 69.1px 221.7px, 66.3px 218.6px, 63.7px 215.5px, 61.0px 212.3px, 58.5px 209.2px, 56.1px 206.0px, 53.7px 202.7px, 51.4px 199.5px, 49.2px 196.2px, 47.0px 192.9px, 45.0px 189.6px, 43.0px 186.2px, 41.2px 182.9px, 39.4px 179.5px, 37.7px 176.1px, 36.1px 172.7px, 34.6px 169.3px, 33.2px 165.9px, 31.8px 162.4px, 30.6px 159.0px, 29.5px 155.6px, 28.4px 152.2px, 27.5px 148.7px, 26.6px 145.3px, 25.9px 141.9px, 25.2px 138.5px, 24.7px 135.1px, 24.2px 131.8px, 23.8px 128.4px, 23.6px 125.1px, 23.4px 121.8px, 23.4px 118.5px, 23.4px 115.2px, 23.5px 111.9px, 23.8px 108.7px, 24.1px 105.5px, 24.5px 102.4px, 25.1px 99.2px, 25.7px 96.2px, 26.4px 93.1px, 27.3px 90.1px, 28.2px 87.1px, 29.2px 84.2px, 30.3px 81.3px, 31.5px 78.5px, 32.8px 75.7px, 34.2px 72.9px, 35.7px 70.2px, 37.3px 67.6px, 39.0px 65.0px, 40.7px 62.5px, 42.6px 60.0px, 44.5px 57.6px, 46.5px 55.3px, 48.6px 53.0px, 50.8px 50.8px, 53.1px 48.6px, 55.5px 46.5px, 57.9px 44.5px, 60.4px 42.5px, 63.0px 40.6px, 65.7px 38.8px, 68.4px 37.1px, 71.2px 35.4px, 74.1px 33.8px, 77.1px 32.3px, 80.1px 30.8px, 83.2px 29.4px, 86.3px 28.1px, 89.5px 26.9px, 92.8px 25.8px, 96.1px 24.7px, 99.5px 23.8px, 102.9px 22.9px, 106.4px 22.0px, 110.0px 21.3px, 113.5px 20.7px, 117.2px 20.1px, 120.8px 19.6px, 124.5px 19.2px, 128.3px 18.9px, 132.1px 18.6px, 135.9px 18.5px, 139.7px 18.4px, 143.6px 18.4px, 147.5px 18.5px, 151.4px 18.7px, 155.4px 19.0px, 159.4px 19.3px, 163.4px 19.8px, 167.4px 20.3px, 171.4px 20.9px, 175.4px 21.6px, 179.4px 22.4px, 183.5px 23.2px, 187.5px 24.1px, 191.5px 25.1px, 195.6px 26.2px, 199.6px 27.4px, 203.6px 28.7px, 207.7px 30.0px, 211.7px 31.4px, 215.7px 32.9px, 219.6px 34.4px, 223.6px 36.1px, 227.5px 37.8px, 231.4px 39.5px, 235.3px 41.4px, 239.2px 43.3px, 243.0px 45.3px, 246.8px 47.3px, 250.5px 49.5px, 254.3px 51.6px, 257.9px 53.9px, 261.6px 56.2px, 265.2px 58.6px, 268.7px 61.0px, 272.2px 63.5px, 275.7px 66.1px, 279.0px 68.7px, 282.4px 71.3px, 285.7px 74.0px, 288.9px 76.8px, 292.1px 79.6px, 295.2px 82.5px, 298.2px 85.4px, 301.2px 88.3px, 304.1px 91.3px, 306.9px 94.3px, 309.6px 97.4px, 312.3px 100.5px, 314.9px 103.6px, 317.5px 106.8px, 319.9px 110.0px, 322.3px 113.2px, 324.6px 116.5px, 326.8px 119.8px, 328.9px 123.1px, 331.0px 126.4px, 333.0px 129.8px, 334.8px 133.1px, 336.6px 136.5px, 338.3px 139.9px, 339.9px 143.3px, 341.4px 146.7px, 342.8px 150.1px, 344.2px 153.6px, 345.4px 157.0px, 346.5px 160.4px, 347.6px 163.8px, 348.5px 167.2px, 349.4px 170.7px, 350.1px 174.1px, 350.8px 177.5px, 351.3px 180.9px, 351.8px 184.2px, 352.1px 187.6px, 352.4px 190.9px, 352.6px 194.2px, 352.6px 197.5px, 352.6px 200.8px, 352.5px 204.1px, 352.2px 207.3px, 351.9px 210.5px, 351.4px 213.6px, 350.9px 216.7px, 350.3px 219.8px, 349.6px 222.9px, 348.7px 225.9px, 347.8px 228.9px, 346.8px 231.8px, 345.7px 234.7px, 344.5px 237.5px, 343.2px 240.3px, 341.8px 243.1px, 340.3px 245.8px, 338.7px 248.4px, 337.0px 251.0px, 335.3px 253.5px, 333.4px 256.0px, 331.5px 258.4px, 329.5px 260.7px, 327.3px 263.0px, 325.2px 265.2px, 322.9px 267.4px, 320.5px 269.5px, 318.1px 271.5px, 315.6px 273.5px, 313.0px 275.4px, 310.3px 277.2px, 307.6px 278.9px, 304.8px 280.6px, 301.9px 282.2px, 298.9px 283.7px, 295.9px 285.2px, 292.8px 286.6px, 289.7px 287.8px, 286.5px 289.1px, 283.2px 290.2px, 279.9px 291.3px, 276.5px 292.2px, 273.1px 293.1px, 269.6px 294.0px, 266.0px 294.7px, 262.5px 295.3px, 258.8px 295.9px, 255.2px 296.4px, 251.5px 296.8px, 247.7px 297.1px, 243.9px 297.3px, 240.1px 297.5px, 236.3px 297.6px, 232.4px 297.6px, 228.5px 297.4px, 224.5px 297.3px, 220.6px 297.0px, 216.6px 296.6px, 212.6px 296.2px, 208.6px 295.7px, 204.6px 295.1px, 200.6px 294.4px, 196.6px 293.6px, 192.5px 292.8px, 188.5px 291.9px, 184.4px 290.8px, 180.4px 289.8px, 176.4px 288.6px, 172.3px 287.3px, 168.3px 286.0px, 164.3px 284.6px, 160.3px 283.1px, 156.4px 281.6px, 152.4px 279.9px, 148.5px 278.2px, 144.6px 276.5px, 140.7px 274.6px, 136.8px 272.7px, 133.0px 270.7px, 129.2px 268.7px)
+                                    }
+                                    .imageBox img {
+                                        width: 373px;
+                                        height: 314px;
+                                        object-fit: cover;
+                                    }
+                                
+
+                                .mainHeading {
+                                    width: 301px;
+                                    height: 64px;
+                                    position: absolute;
+                                    left: 31px;
+                                    top: 97px;
+                                    font-family: 'BakbakOne', serif;
+                                    font-weight: 400;
+                                    font-style: normal;
+                                    font-size: 38.00px;
+                                    color: rgb(17, 17, 17);
+                                    line-height: 1.05em;
+                                    display: flex;
+                                    align-items: center;
+                                    text-align: left;
+                                }
+                                        
+
+                                .subHeading1,.subHeading2,.subHeading3 {
+                                    width: 307px;
+                                    height: 79px;
+                                    position: absolute;
+                                    left: 31px;
+                                    top: 61px;
+                                    font-family: 'Raleway', serif;
+                                    font-weight: 600;
+                                    font-style: normal;
+                                    font-size: 18.01px;
+                                    color: rgb(33, 33, 33);
+                                    line-height: 1.11em;
+                                    display: flex;
+                                    align-items: center;
+                                    text-align: left;
+                                }
+                                        
+.cta {
+    width: auto;
+    display: flex;
+    position: absolute;
+    left: 30px;
+    top: 154px;
+    text-align: center;
+}
+.button {
+    min-width: 143px;
+    max-width: 145.00px;
+    max-height: 41px;
+    font-size: 16.02px;
+    font-family: 'Raleway', serif;
+    font-weight: 700;
+    font-style: normal;
+    cursor: pointer;
+    color: rgb(0, 0, 0);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(203, 220, 0, 255);
+    padding: 0.5em 0.65em 0.51em;
+    text-align: center;
+    line-height: 1.2em;
+    border-radius: 1.19em;
+}
+
+                            .logo {
+                                width: 190px;
+                                height: 133px;
+                                position: absolute;
+                                left: 9px;
+                                top: 57px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: flex-start;
+                            }
+                            .logo img{
+                                max-width: 190px;
+                                max-height: 133px;
+                            }
+                            
