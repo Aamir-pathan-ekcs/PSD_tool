@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: psd-to-html-converter
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+    preBuildCommand: apt-get update && apt-get install -y python3
