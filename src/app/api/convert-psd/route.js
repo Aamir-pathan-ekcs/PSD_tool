@@ -12,33 +12,36 @@ export async function POST(request) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    // Save the uploaded zip temporarily
-    const uploadDir = path.join(process.cwd(), "uploads");
+    // Use Render's /tmp directory for temporary files
+    const uploadDir = "/tmp/uploads";
     await fs.mkdir(uploadDir, { recursive: true });
     const filePath = path.join(uploadDir, file.name);
-    const fileBuffer = await file.arrayBuffer();
-    await fs.writeFile(filePath, Buffer.from(fileBuffer));
 
-    // Run the Python script
+    // Stream the file to avoid body size limits
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    await fs.writeFile(filePath, fileBuffer);
+
+    // Run the Python script (ensure Python is available on Render)
     const pythonScriptPath = path.join(process.cwd(), "scripts", "convert_psd.py");
-    const { stdout, stderr } = await exec(`python "${pythonScriptPath}" "${filePath}"`);
+    const { stdout, stderr } = await exec(`python3 "${pythonScriptPath}" "${filePath}"`, {
+      encoding: "binary" // Ensure binary output for ZIP file
+    });
 
     // Log stderr for debugging
     if (stderr) {
       console.error("Python script stderr:", stderr);
-      // Only throw an error if stdout is empty (indicating a failure)
       if (!stdout) {
         throw new Error(stderr);
       }
     }
 
-    // The stdout is the binary zip content
-    const zipBuffer = Buffer.from(stdout, 'binary');
+    // Convert stdout to a Buffer (ZIP content)
+    const zipBuffer = Buffer.from(stdout, "binary");
 
-    // Clean up
-    await fs.unlink(filePath);
+    // Clean up temporary files
+    await fs.unlink(filePath).catch(err => console.error("Cleanup error:", err));
 
-    // Return the zip file as a response
+    // Return the ZIP file as a response
     return new NextResponse(zipBuffer, {
       status: 200,
       headers: {
