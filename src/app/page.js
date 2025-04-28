@@ -8,6 +8,7 @@ export default function Home() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [htmlFiles, setHtmlFiles] = useState({});
+  const [dimensions, setDimensions] = useState({});
   const router = useRouter();
 
   // Fetch HTML files from the output folder
@@ -25,15 +26,49 @@ export default function Home() {
           return acc;
         }, {});
 
-        setHtmlFiles(groupedFiles);
-      } catch (error) {
-        console.error("Error fetching HTML files:", error);
-        setError("Failed to load HTML files");
-      }
-    };
+      // Fetch content and extract dimensions for each file
+      const dimensionPromises = data.map(async (file) => {
+        const filePath = file.url.replace("/api/html/", "");
+        const contentResponse = await fetch(file.url);
+        if (!contentResponse.ok) throw new Error(`Failed to fetch content for ${filePath}`);
+        const content = await contentResponse.text();
 
-    fetchHtmlFiles();
-  }, []);
+        // Parse the HTML to extract dimensions
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(content, 'text/html');
+        const metaTag = doc.querySelector('meta[name="ad.size"]');
+        let width = "100%"; // Default width
+        let height = "300px"; // Default height
+        if (metaTag) {
+          const contentAttr = metaTag.getAttribute('content');
+          const widthMatch = contentAttr.match(/width=(\d+)/);
+          const heightMatch = contentAttr.match(/height=(\d+)/);
+          if (widthMatch) width = `${widthMatch[1]}px`;
+          if (heightMatch) height = `${heightMatch[1]}px`;
+          console.log(`Extracted dimensions for ${filePath}: width=${width}, height=${height}`);
+        } else {
+          console.warn(`No ad.size meta tag found in ${filePath}, using default dimensions`);
+        }
+
+        return { filePath, width, height };
+      });
+
+      const dimensionsData = await Promise.all(dimensionPromises);
+      const newDimensions = dimensionsData.reduce((acc, { filePath, width, height }) => ({
+        ...acc,
+        [filePath]: { width, height }
+      }), {});
+      setDimensions(newDimensions);
+
+      setHtmlFiles(groupedFiles);
+      } catch (error) {
+      console.error("Error fetching HTML files:", error);
+      setError("Failed to load HTML files");
+      }
+      };
+
+      fetchHtmlFiles();
+      }, []);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -83,6 +118,31 @@ export default function Home() {
           return acc;
         }, {});
         setHtmlFiles(groupedFiles);
+        const dimensionPromises = data.map(async (file) => {
+          const filePath = file.url.replace("/api/html/", "");
+          const contentResponse = await fetch(file.url);
+          if (!contentResponse.ok) throw new Error(`Failed to fetch content for ${filePath}`);
+          const content = await contentResponse.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(content, 'text/html');
+          const metaTag = doc.querySelector('meta[name="ad.size"]');
+          let width = "100%";
+          let height = "300px";
+          if (metaTag) {
+            const contentAttr = metaTag.getAttribute('content');
+            const widthMatch = contentAttr.match(/width=(\d+)/);
+            const heightMatch = contentAttr.match(/height=(\d+)/);
+            if (widthMatch) width = `${widthMatch[1]}px`;
+            if (heightMatch) height = `${heightMatch[1]}px`;
+          }
+          return { filePath, width, height };
+        });
+        const dimensionsData = await Promise.all(dimensionPromises);
+        const newDimensions = dimensionsData.reduce((acc, { filePath, width, height }) => ({
+          ...acc,
+          [filePath]: { width, height }
+        }), {});
+        setDimensions(newDimensions);
       };
       fetchHtmlFiles();
     } catch (error) {
@@ -94,7 +154,7 @@ export default function Home() {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
+    <div style={{ padding: "20px", maxWidth: "1500px", margin: "0 auto" }}>
       <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>PSD to HTML Converter</h1>
       <div style={{ marginBottom: "20px" }}>
         <input
@@ -135,28 +195,38 @@ export default function Home() {
       {error && <p style={{ color: "red", marginBottom: "20px" }}>{error}</p>}
   
       <h2 style={{ fontSize: "20px", marginTop: "20px" }}>Converted HTML Previews</h2>
+      <div className="previewContent" style={{display: "flex", gap: "22px", flexWrap: "wrap"}}>
       {Object.keys(htmlFiles).length > 0 ? (
         Object.keys(htmlFiles).map((folder) => (
           <div key={folder} style={{ marginBottom: "30px" }}>
             <h3 style={{ fontSize: "18px", marginBottom: "10px" }}>{folder}</h3>
             <div style={{ display: "grid", gap: "20px" }}>
-              {htmlFiles[folder].map((htmlFile, index) => (
-                <div key={index} style={{ border: "1px solid #ccc", padding: "10px" }}>
-                  <h4>{htmlFile.name}</h4>
-                  <iframe
-                    src={htmlFile.url}
-                    style={{ width: "100%", height: "300px", border: "none" }}
-                    title={`Preview of ${htmlFile.name}`}
-                    sandbox="allow-same-origin allow-scripts"
-                  />
-                </div>
-              ))}
+              {htmlFiles[folder].map((htmlFile, index) => {
+                const filePath = htmlFile.url.replace("/api/html/", "");
+                return (
+                  <div key={index} style={{ border: "1px solid #ccc", padding: "10px" }}>
+                    <h4>{htmlFile.name}</h4>
+                    <iframe
+                      src={htmlFile.url}
+                      style={{
+                        width: dimensions[filePath]?.width || "100%",
+                        height: dimensions[filePath]?.height || "300px",
+                        border: "none"
+                      }}
+                      // loading="lazy"
+                      title={`Preview of ${htmlFile.name}`}
+                      sandbox="allow-same-origin allow-scripts"
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
         ))
       ) : (
         <p>No HTML files available. Convert a PSD to see previews.</p>
       )}
+      </div>
     </div>
   );
 }

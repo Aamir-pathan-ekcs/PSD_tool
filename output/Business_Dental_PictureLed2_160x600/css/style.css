@@ -1,0 +1,149 @@
+* {
+                        margin: 0px;
+                        padding: 0px;
+                        box-sizing: border-box;
+                    }
+
+                    :root {
+                        --width: 160px;
+                        --height: 600px;
+                    }
+                    
+
+                    .container {
+                        width: 160px;
+                        height: 600px;
+                        position: relative;
+                        overflow: hidden;
+                        border: 1px solid #7a8599;
+                        background-color: rgb(218, 239, 251);
+                    }
+                    
+   .clicktru {
+                        z-index:9999; width:100%; height:100%; position:absolute;
+                    }
+
+                        a{
+                            text-decoration:none;
+                    } 
+
+                        #sd_btn_Click-Through-URL:empty{display:none;} 
+                    
+
+                        .contentSection {
+                            width: 162px;
+                            height: 270px;
+                            position: relative;
+                            left: -1px;
+                            top: 322px;
+                            overflow: hidden;
+                        }
+                                    
+
+                                    .imageBox {
+                                        width: 159px;
+                                        height: 248px;
+                                        position: absolute;
+                                        left: -1px;
+                                        top: -1px;
+                                        z-index: 1;
+                                        overflow: hidden;
+                                        border-radius: initial;
+                                        clip-path: inherit;
+                                        -webkit-clip-path: inherit
+                                    }
+                                    .imageBox img {
+                                        width: 159px;
+                                        height: 248px;
+                                        object-fit: cover;
+                                    }
+                                
+
+                            .shape1 {
+                                width: 155px;
+                                height: 597px;
+                                position: absolute;
+                                left: 2px;
+                                top: 1px;
+                                background-color: rgb(0, 107, 138, 255);
+                                border-radius: initial;
+                                clip-path: polygon(1px 0px, 0px 596px, 155px 596px, 155px 1px);
+                                -webkit-clip-path: polygon(1px 0px, 0px 596px, 155px 596px, 155px 1px)
+                            
+                            }
+                                        
+.cta {
+    width: 159px;
+    display: flex;
+    position: absolute;
+    left: 0px;
+    top: 209px;
+    justify-content: center;
+}
+.button {
+    min-width: 130px;
+    max-width: 127.20px;
+    max-height: 37px;
+    font-size: 14.02px;
+    font-family: 'NunitoSans', serif;
+    font-weight: 700;
+    font-style: normal;
+    cursor: pointer;
+    color: rgb(255, 255, 255);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(19, 29, 60, 255);
+    padding: 0.5em 0.65em 0.51em;
+    text-align: center;
+    line-height: 1.2em;
+    border-radius: 0.00em;
+}
+
+                                .subHeading1,.subHeading2,.subHeading3 {
+                                    width: 133px;
+                                    height: 176px;
+                                    position: absolute;
+                                    left: 14px;
+                                    top: 19px;
+                                    font-family: 'NunitoSans', serif;
+                                    font-weight: 600;
+                                    font-style: normal;
+                                    font-size: 18.01px;
+                                    color: rgb(33, 33, 33);
+                                    line-height: 1.11em;
+                                    text-align: center;
+                                }
+                                        
+
+                                .mainHeading {
+                                    width: 145px;
+                                    height: 191px;
+                                    position: absolute;
+                                    left: 9px;
+                                    top: 45px;
+                                    font-family: 'NunitoSans', serif;
+                                    font-weight: 800;
+                                    font-style: normal;
+                                    font-size: 34.00px;
+                                    color: rgb(19, 29, 59);
+                                    line-height: 1.18em;
+                                    text-align: center;
+                                }
+                                        
+
+                            .logo {
+                                width: 140px;
+                                height: 54px;
+                                position: absolute;
+                                left: 9px;
+                                top: 263px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                            }
+                            .logo img{
+                                max-width: 140px;
+                                max-height: 54px;
+                            }
+                            
