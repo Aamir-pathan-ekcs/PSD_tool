@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -15,7 +16,26 @@ export default function EditPage() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  const mappingEmt = {
+    'mainHeading-checkbox': 'sd_txta_Heading',
+    'subHeading1-checkbox': 'sd_txta_Sub-Heading-1', 
+    'subHeading2-checkbox': 'sd_txta_Sub-Heading-2', 
+    'subHeading3-checkbox': 'sd_txta_Sub-Heading-3',
+    'cta-checkbox': 'sd_btn_Click-Through-URL',
+    'Image-1-checkbox': 'sd_img_Image-1',
+    'Image-2-checkbox': 'sd_img_Image-2',
+    'Image-3-checkbox': 'sd_img_Image-3'
+  };
+  const mappingEmtParent = {
+    'mainHeading-checkboxParent': 'sd_txta_Heading',
+    'subHeading1-checkboxParent': 'sd_txta_Sub-Heading-1', 
+    'subHeading2-checkboxParent': 'sd_txta_Sub-Heading-2', 
+    'subHeading3-checkboxParent': 'sd_txta_Sub-Heading-3',
+    'cta-checkboxParent': 'sd_btn_Click-Through-URL',
+    'Image-1-checkboxParent': 'sd_img_Image-1',
+    'Image-2-checkboxParent': 'sd_img_Image-2',
+    'Image-3-checkboxParent': 'sd_img_Image-3'
+  };
     // Fetch HTML files on mount
     useEffect(() => {
       const fetchHtmlFiles = async () => {
@@ -45,29 +65,9 @@ export default function EditPage() {
       };
   
       fetchHtmlFiles();
-    }, [searchParams]);
+    }, [searchParams, allCheckboxes, mappingEmt, mappingEmtParent, selectTarget, selectTargetParent]);
 
 
-    const mappingEmt = {
-      'mainHeading-checkbox': 'sd_txta_Heading',
-      'subHeading1-checkbox': 'sd_txta_Sub-Heading-1', 
-      'subHeading2-checkbox': 'sd_txta_Sub-Heading-2', 
-      'subHeading3-checkbox': 'sd_txta_Sub-Heading-3',
-      'cta-checkbox': 'sd_btn_Click-Through-URL',
-      'Image-1-checkbox': 'sd_img_Image-1',
-      'Image-2-checkbox': 'sd_img_Image-2',
-      'Image-3-checkbox': 'sd_img_Image-3'
-    };
-    const mappingEmtParent = {
-      'mainHeading-checkboxParent': 'sd_txta_Heading',
-      'subHeading1-checkboxParent': 'sd_txta_Sub-Heading-1', 
-      'subHeading2-checkboxParent': 'sd_txta_Sub-Heading-2', 
-      'subHeading3-checkboxParent': 'sd_txta_Sub-Heading-3',
-      'cta-checkboxParent': 'sd_btn_Click-Through-URL',
-      'Image-1-checkboxParent': 'sd_img_Image-1',
-      'Image-2-checkboxParent': 'sd_img_Image-2',
-      'Image-3-checkboxParent': 'sd_img_Image-3'
-    };
     
     function selectTarget(checkboxd, elementD) {
       const checkbox = document.getElementById(checkboxd);
