@@ -10,19 +10,7 @@ export default function Home() {
   const [htmlFiles, setHtmlFiles] = useState({});
   const [dimensions, setDimensions] = useState({});
   const router = useRouter();
-  const [psdFile, setPsdFile] = useState(null);
-  const [convertedHtml, setConvertedHtml] = useState({});
-  const [sessionId, setSessionId] = useState({});
-  useEffect(() => {
-    const storedSessionId = typeof window !== "undefined" ? localStorage.getItem("sessionId") : null;
-    if (!storedSessionId) {
-      const newSessionId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-      if (typeof window !== "undefined") localStorage.setItem("sessionId", newSessionId);
-      setSessionId(newSessionId);
-    } else {
-      setSessionId(storedSessionId);
-    }
-  }, []);
+
   // Fetch HTML files from the output folder
   useEffect(() => {
     const fetchHtmlFiles = async () => {
@@ -83,67 +71,43 @@ export default function Home() {
       }, []);
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-  
-    setIsLoading(true);
-    try {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const base64 = event.target.result.split(",")[1]; // Remove data URL prefix
-        const response = await fetch("/.netlify/functions/convert-psd", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ psdBase64: base64, sessionId }),
-        });
-  
-        if (!response.ok) throw new Error(await response.text());
-        const data = await response.json();
-        if (data.html) {
-          const filename = data.filename;
-          setConvertedHtml((prev) => ({ ...prev, [filename]: data.html }));
-          setSelectedFiles((prev) => new Set([...prev, filename]));
-          setHtmlContents((prev) => ({ ...prev, [filename]: data.html }));
-        } else {
-          throw new Error(data.error);
-        }
-      };
-      reader.readAsDataURL(file);
-    } catch (error) {
-      console.error("Error converting PSD:", error);
-      setError(`Failed to convert PSD: ${error.message}`);
-    } finally {
-      setIsLoading(false);
-    }
+    setFile(e.target.files[0]);
+    setError("");
   };
 
-  const handleUpload = async (e) => {
+  const handleUpload = async () => {
+    if (!file) {
+      setError("Please select a file first!");
+      return;
+    }
 
-  
     setIsLoading(true);
+    setError("");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
     try {
-      // const reader = new FileReader();
-      // reader.onload = async (event) => {
-      //   const base64 = event.target.result.split(",")[1]; // Remove data URL prefix
-      //   const response = await fetch("/.netlify/functions/convert-psd", {
-      //     method: "POST",
-      //     headers: { "Content-Type": "application/json" },
-      //     body: JSON.stringify({ psdBase64: base64, sessionId }),
-      //   });
-  
-      //   if (!response.ok) throw new Error(await response.text());
-      //   const data = await response.json();
-      //   if (data.html) {
-      //     const filename = data.filename;
-      //     setConvertedHtml((prev) => ({ ...prev, [filename]: data.html }));
-      //     setSelectedFiles((prev) => new Set([...prev, filename]));
-      //     setHtmlContents((prev) => ({ ...prev, [filename]: data.html }));
-      //   } else {
-      //     throw new Error(data.error);
-      //   }
-      // };
-      // reader.readAsDataURL(file);
-      
+      const response = await fetch("/api/convert-psd", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Unknown error");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "converted_html.zip";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
       // Refresh the list of HTML files after conversion
       const fetchHtmlFiles = async () => {
         const response = await fetch("/api/list-html");
