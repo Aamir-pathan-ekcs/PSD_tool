@@ -12,7 +12,17 @@ export default function Home() {
   const router = useRouter();
   const [psdFile, setPsdFile] = useState(null);
   const [convertedHtml, setConvertedHtml] = useState({});
-
+  const [sessionId, setSessionId] = useState({});
+  useEffect(() => {
+    const storedSessionId = typeof window !== "undefined" ? localStorage.getItem("sessionId") : null;
+    if (!storedSessionId) {
+      const newSessionId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      if (typeof window !== "undefined") localStorage.setItem("sessionId", newSessionId);
+      setSessionId(newSessionId);
+    } else {
+      setSessionId(storedSessionId);
+    }
+  }, []);
   // Fetch HTML files from the output folder
   useEffect(() => {
     const fetchHtmlFiles = async () => {
