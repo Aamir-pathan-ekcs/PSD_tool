@@ -1,6 +1,6 @@
-psd-tools 
-Pillow 
-numpy 
-Flask 
-requests 
+psd-tools
+Pillow
+numpy
+Flask
+requests
 opencv-python
