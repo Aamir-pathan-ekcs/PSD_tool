@@ -1,10 +1,7 @@
-import { exec } from "child_process";
-import { promisify } from "util";
+import { exec } from "child-process-promise";
 import path from "path";
 import fs from "fs/promises";
 import { NextResponse } from "next/server";
-
-const execPromise = promisify(exec);
 
 export async function POST(request) {
   try {
@@ -15,26 +12,33 @@ export async function POST(request) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    const uploadDir = "/tmp/uploads";
+    // Save the uploaded zip temporarily
+    const uploadDir = path.join(process.cwd(), "uploads");
     await fs.mkdir(uploadDir, { recursive: true });
     const filePath = path.join(uploadDir, file.name);
-    const fileBuffer = Buffer.from(await file.arrayBuffer());
-    await fs.writeFile(filePath, fileBuffer);
+    const fileBuffer = await file.arrayBuffer();
+    await fs.writeFile(filePath, Buffer.from(fileBuffer));
 
+    // Run the Python script
     const pythonScriptPath = path.join(process.cwd(), "scripts", "convert_psd.py");
-    const { stdout, stderr } = await execPromise(`python3 "${pythonScriptPath}" "${filePath}"`, {
-      encoding: "binary"
-    });
+    const { stdout, stderr } = await exec(`python "${pythonScriptPath}" "${filePath}"`);
 
+    // Log stderr for debugging
     if (stderr) {
       console.error("Python script stderr:", stderr);
-      if (!stdout) throw new Error(stderr);
+      // Only throw an error if stdout is empty (indicating a failure)
+      if (!stdout) {
+        throw new Error(stderr);
+      }
     }
 
-    const zipBuffer = Buffer.from(stdout, "binary");
+    // The stdout is the binary zip content
+    const zipBuffer = Buffer.from(stdout, 'binary');
 
-    await fs.unlink(filePath).catch(err => console.error("Cleanup error:", err));
+    // Clean up
+    await fs.unlink(filePath);
 
+    // Return the zip file as a response
     return new NextResponse(zipBuffer, {
       status: 200,
       headers: {

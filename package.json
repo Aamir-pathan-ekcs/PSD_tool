@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "child-process-promise": "^2.2.1",
     "file-saver": "^2.0.5",
     "googleapis": "^148.0.0",
     "jsdom": "^26.1.0",
