@@ -10,6 +10,8 @@ export default function Home() {
   const [htmlFiles, setHtmlFiles] = useState({});
   const [dimensions, setDimensions] = useState({});
   const router = useRouter();
+  const [psdFile, setPsdFile] = useState(null);
+  const [convertedHtml, setConvertedHtml] = useState({});
 
   // Fetch HTML files from the output folder
   useEffect(() => {
@@ -75,39 +77,34 @@ export default function Home() {
     setError("");
   };
 
-  const handleUpload = async () => {
-    if (!file) {
-      setError("Please select a file first!");
-      return;
-    }
-
+  const handleUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+  
     setIsLoading(true);
-    setError("");
-
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const response = await fetch("/api/convert-psd", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64 = event.target.result.split(",")[1]; // Remove data URL prefix
+        const response = await fetch("/.netlify/functions/convert-psd", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ psdBase64: base64, sessionId }),
+        });
+  
+        if (!response.ok) throw new Error(await response.text());
         const data = await response.json();
-        throw new Error(data.error || "Unknown error");
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "converted_html.zip";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
+        if (data.html) {
+          const filename = data.filename;
+          setConvertedHtml((prev) => ({ ...prev, [filename]: data.html }));
+          setSelectedFiles((prev) => new Set([...prev, filename]));
+          setHtmlContents((prev) => ({ ...prev, [filename]: data.html }));
+        } else {
+          throw new Error(data.error);
+        }
+      };
+      reader.readAsDataURL(file);
+      
       // Refresh the list of HTML files after conversion
       const fetchHtmlFiles = async () => {
         const response = await fetch("/api/list-html");

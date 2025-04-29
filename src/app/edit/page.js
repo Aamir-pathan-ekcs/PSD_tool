@@ -25,6 +25,24 @@ function EditContent() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [sessionId] = useState(() => {
+    let storedSessionId = localStorage.getItem("sessionId");
+    if (!storedSessionId) {
+      storedSessionId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      localStorage.setItem("sessionId", storedSessionId);
+    }
+    return storedSessionId;
+  });
+  
+  const downloadFile = (filePath, content) => {
+    const blob = new Blob([content], { type: "text/html" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${sessionId}_${filePath.split("/").pop()}`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
 
   // Fetch HTML files on mount
   useEffect(() => {
@@ -475,8 +493,14 @@ function EditContent() {
 
     setIsLoading(true);
     try {
+
+      Array.from(selectedFiles).forEach((filePath) => {
+        const content = htmlContents[filePath] || "";
+        downloadFile(filePath, content); // Trigger download for each file
+      });
+      setError("Files are ready for download!");
+
       const savePromises = Array.from(selectedFiles).map(async (filePath) => {
-        alert(htmlContents[filePath]);
         const decodedFilename = decodeURIComponent(filePath);
         const response = await fetch("/api/save-html", {
           method: "POST",
@@ -676,7 +700,7 @@ function EditContent() {
             cursor: isLoading ? "not-allowed" : "pointer",
           }}
         >
-          {isLoading ? "Saving..." : "Save All"}
+          {isLoading ? "Saving..." : "Save All (Download)"}
         </button>
       </div>
       {error && (
