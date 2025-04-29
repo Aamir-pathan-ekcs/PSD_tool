@@ -73,11 +73,6 @@ export default function Home() {
       }, []);
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-    setError("");
-  };
-
-  const handleUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
   
@@ -104,6 +99,35 @@ export default function Home() {
         }
       };
       reader.readAsDataURL(file);
+  };
+
+  const handleUpload = async () => {
+    // const file = e.target.files[0];
+    // if (!file) return;
+  
+    // setIsLoading(true);
+    // try {
+    //   const reader = new FileReader();
+    //   reader.onload = async (event) => {
+    //     const base64 = event.target.result.split(",")[1]; // Remove data URL prefix
+    //     const response = await fetch("/.netlify/functions/convert-psd", {
+    //       method: "POST",
+    //       headers: { "Content-Type": "application/json" },
+    //       body: JSON.stringify({ psdBase64: base64, sessionId }),
+    //     });
+  
+    //     if (!response.ok) throw new Error(await response.text());
+    //     const data = await response.json();
+    //     if (data.html) {
+    //       const filename = data.filename;
+    //       setConvertedHtml((prev) => ({ ...prev, [filename]: data.html }));
+    //       setSelectedFiles((prev) => new Set([...prev, filename]));
+    //       setHtmlContents((prev) => ({ ...prev, [filename]: data.html }));
+    //     } else {
+    //       throw new Error(data.error);
+    //     }
+    //   };
+    //   reader.readAsDataURL(file);
       
       // Refresh the list of HTML files after conversion
       const fetchHtmlFiles = async () => {
