@@ -12,19 +12,38 @@ import sys
 import zipfile
 import tempfile
 import shutil
+import json
+import warnings
+
+def log_to_stderr(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)  # Use print directly, no recursion
 
 def convert_psd_to_html(zip_path):
+    if not zip_path.lower().endswith('.zip'):
+        return {"success": False, "error": "Input file must be a ZIP file"}
+
+    if not os.path.exists(zip_path):
+        return {"success": False, "error": f"File not found: {zip_path}"}
+
+    results = {}
     with tempfile.TemporaryDirectory() as temp_dir:
+        # Extract the ZIP file
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(temp_dir)
 
-        psd_files = [f for f in os.listdir(temp_dir) if f.endswith('.psd')]
+        # Find all PSD files in the extracted directory
+        psd_files = [f for f in os.listdir(temp_dir) if f.lower().endswith('.psd')]
         if not psd_files:
-            print("Error: No PSD files found in the zip", file=sys.stderr)
-            sys.exit(1)
+            return {"success": False, "error": "No PSD files found in the ZIP"}
 
-        output_dir = os.path.join(temp_dir, "output")
-        os.makedirs(output_dir, exist_ok=True)
+
+        # Suppress warnings from psd_tools and redirect to stderr
+        warnings.filterwarnings("always", category=UserWarning)
+        def warn_with_stderr(message, category, filename, lineno, file=None, line=None):
+            log_to_stderr(f"{filename}:{lineno}: {category.__name__}: {message}")
+
+        warnings.showwarning = warn_with_stderr
+
 
         def sanitize_filename(filename):
             """Sanitize layer names to be valid filenames."""
@@ -61,14 +80,14 @@ def convert_psd_to_html(zip_path):
                         pixels = list(image.getdata())
                         
                         if not pixels:
-                            print(f"Layer '{layer.name}' has no pixel data.")
+                            log_to_stderr(f"Layer '{layer.name}' has no pixel data.")
                             return None
                         opaque_pixels = [p for p in pixels if p[3] > 0] 
                         if not opaque_pixels:
-                            print(f"Layer '{layer.name}' has only transparent pixels: {pixels[:5]}")
+                            log_to_stderr(f"Layer '{layer.name}' has only transparent pixels: {pixels[:5]}")
                             return None
                         most_common_color = Counter(opaque_pixels).most_common(1)[0][0]
-                        print(f"Most common color in '{layer.name}'")
+                        log_to_stderr(f"Most common color in '{layer.name}'")
                         return most_common_color
 
                     else:
@@ -77,7 +96,7 @@ def convert_psd_to_html(zip_path):
                     raise ValueError("Unsupported layer kind")
 
             except Exception as e:
-                print(f"Error processing layer '{layer.name}': {str(e)}")
+                log_to_stderr(f"Error processing layer '{layer.name}': {str(e)}")
                 return None
 
 
@@ -140,7 +159,7 @@ def convert_psd_to_html(zip_path):
                     approx = cv2.approxPolyDP(contour, epsilon, True)
                     sides = len(approx)
 
-                    # print(f"Contour {i}: Area={area}, Perimeter={perimeter}, Sides={sides}") done
+                    # log_to_stderr(f"Contour {i}: Area={area}, Perimeter={perimeter}, Sides={sides}") done
 
                     shape = "Unknown"
                     clip_path = ""
@@ -185,13 +204,13 @@ def convert_psd_to_html(zip_path):
                         shape = f"Polygon with {sides} sides"
                         clip_path = "polygon(" + ", ".join(f"{p[0][0]}px {p[0][1]}px" for p in approx) + ")"
 
-                    print(f"Processed: Shape {i} - {shape}")
+                    log_to_stderr(f"Processed: Shape {i} - {shape}")
                     clip_paths.append(clip_path.strip("[]'"))
                     cv2.drawContours(image, [approx], -1, (0, 255, 0), 2)
 
                 return clip_paths[0] if clip_paths else None
             except Exception as e:
-                print(f"Error in create_shapes for {image_path}: {e}")
+                log_to_stderr(f"Error in create_shapes for {image_path}: {e}")
                 return None
 
 
@@ -208,14 +227,14 @@ def convert_psd_to_html(zip_path):
                     gray = cv2.cvtColor(image, cv2.COLOR_BGRA2GRAY)
 
                     if gray.min() == gray.max():
-                        print("Grayscale is uniform, using alpha channel or enhancing contrast")
+                        log_to_stderr("Grayscale is uniform, using alpha channel or enhancing contrast")
                         if alpha.min() != alpha.max():
                             gray = alpha
                         else:
                             gray = cv2.normalize(gray, None, 0, 255, cv2.NORM_MINMAX)
 
                 gray = cv2.GaussianBlur(gray, (3, 3), 0)
-                print(f"Applied Gaussian blur to grayscale")
+                log_to_stderr(f"Applied Gaussian blur to grayscale")
 
                 edges = cv2.Canny(gray, 10, 50)
                 kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
@@ -224,10 +243,10 @@ def convert_psd_to_html(zip_path):
                 cv2.imwrite(f"output/{file_name_t}/images/{child_layer.name}_edges.png", edges)
 
                 contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-                print(f"Found {len(contours)} contours")
+                log_to_stderr(f"Found {len(contours)} contours")
 
                 if not contours:
-                    print(f"No contours found. Check saved edges image: {child_layer.name}_edges.png")
+                    log_to_stderr(f"No contours found. Check saved edges image: {child_layer.name}_edges.png")
                 else:
                     for i, contour in enumerate(contours, 1):
                         epsilon = 0.005 * cv2.arcLength(contour, True) 
@@ -236,7 +255,7 @@ def convert_psd_to_html(zip_path):
                         
                         area = cv2.contourArea(contour)
                         if area < 100:
-                            print(f"Skipping contour {i} (area < 100)")
+                            log_to_stderr(f"Skipping contour {i} (area < 100)")
                             continue
 
                         if len(contour) >= 5:
@@ -278,7 +297,7 @@ def convert_psd_to_html(zip_path):
                         else:
                             shape = f"Polygon with {sides} sides"
                             clip_path = "polygon(" + ", ".join(f"{p[0][0]:.1f}px {p[0][1]:.1f}px" for p in approx) + ")"
-                        print(f"Contour {i}: Shape type = {shape}")
+                        log_to_stderr(f"Contour {i}: Shape type = {shape}")
                         if shape == "Rectangle":
                             file_path_r = [
                                 image_path,
@@ -290,14 +309,14 @@ def convert_psd_to_html(zip_path):
                             return None
 
                         if shape == "Ellipse":
-                            print(f"CSS Ellipse Alternative: {css_ellipse}")
-                        print(f"Processed: Shape {i}, Clip-path:")
+                            log_to_stderr(f"CSS Ellipse Alternative: {css_ellipse}")
+                        log_to_stderr(f"Processed: Shape {i}, Clip-path:")
                         
                         cv2.drawContours(image, [approx], -1, (0, 255, 0), 2)
                         if 'ellipse' in locals():
                             cv2.ellipse(image, ellipse, (255, 0, 0), 2)
                     cv2.imwrite(f"output/{file_name_t}/images/{child_layer.name}_contours.png", image)
-                    print(f"Saved annotated image: {child_layer.name}_contours.png")
+                    log_to_stderr(f"Saved annotated image: {child_layer.name}_contours.png")
                     file_path_r = [
                         image_path,
                         f"output/{file_name_t}/images/{child_layer.name}_edges.png",
@@ -307,7 +326,7 @@ def convert_psd_to_html(zip_path):
                         os.remove(path_r)
                     return clip_path
             except Exception as e:
-                print(f"Error in create_shapes for {image_path}: {e}")
+                log_to_stderr(f"Error in create_shapes for {image_path}: {e}")
  
 
 
@@ -356,7 +375,7 @@ def convert_psd_to_html(zip_path):
         def broder_radius_get(shape, child_layer):
             radii = getattr(shape, 'radii', None)
             if radii:
-                # print(f"child_layer '{child_layer.name}' has border radius: {radii}")
+                # log_to_stderr(f"child_layer '{child_layer.name}' has border radius: {radii}")
                 top_left = radii.get(b'topLeft', 0.0)
                 top_right = radii.get(b'topRight', 0.0)
                 bottom_right = radii.get(b'bottomRight', 0.0)
@@ -365,7 +384,7 @@ def convert_psd_to_html(zip_path):
                 border_radius = f"{top_left}px {top_right}px {bottom_right}px {bottom_left}px"
                 return border_radius
             else:
-                print(f"child_layer '{child_layer.name}' is a rounded rectangle but no radius defined.")
+                log_to_stderr(f"child_layer '{child_layer.name}' is a rounded rectangle but no radius defined.")
                 return None
 
 
@@ -429,10 +448,10 @@ def convert_psd_to_html(zip_path):
                         if cnt == 0:
                             try:
                                 image.save(image_path)
-                                print(f"Saved image for {layer.name} at {image_path}")
+                                log_to_stderr(f"Saved image for {layer.name} at {image_path}")
                                 extracted_values['logo_path'] = image_path
                             except Exception as e:
-                                print(f"Failed to save image for {layer.name}: {e}")
+                                log_to_stderr(f"Failed to save image for {layer.name}: {e}")
                             outerSection["logo"].append(f'<div class="logo">')
                             outerSection["logo"].append(f'<img src="images/{sanitized_name}.png" alt="logo" id="sd_img_Logo"/>')
                             outerSection["logo"].append('</div>')
@@ -453,7 +472,7 @@ def convert_psd_to_html(zip_path):
                             }}
                             """)
                             logo_processed = True
-                            print(f"Processed Logo: {sanitized_name}")
+                            log_to_stderr(f"Processed Logo: {sanitized_name}")
 
 
                     shape_names = ["shape 1", "shape 2", "shape 3", "shape 4", "shape 5", "shape 6"]
@@ -468,7 +487,7 @@ def convert_psd_to_html(zip_path):
                                 layer_image = layer.composite()
                                 image_path = f"output/{file_name_t}/images/{sanitized_name}.png"
                                 layer_image.save(image_path)
-                                print(f"Saved shape layer to: {image_path}")
+                                log_to_stderr(f"Saved shape layer to: {image_path}")
                                 # if layer.kind == 'shape' and hasattr(layer, 'vector_mask'):
                                 if layer.origination:
                                     for shape in layer.origination:
@@ -488,12 +507,12 @@ def convert_psd_to_html(zip_path):
                             # layer_image = layer.composite()
                             # image_path = f"output/{file_name_t}/images/{sanitized_name}.png"
                             # layer_image.save(image_path)
-                            # print(f"Saved shape layer to: {image_path}")
+                            # log_to_stderr(f"Saved shape layer to: {image_path}")
 
                             # def extract_clip_path(image_path):
                             #     image = cv2.imread(image_path)
                             #     if image is None:
-                            #         print(f"Error: Could not load image at {image_path}")
+                            #         log_to_stderr(f"Error: Could not load image at {image_path}")
                             #         return None
 
                             #     height, width = image.shape[:2]
@@ -535,24 +554,24 @@ def convert_psd_to_html(zip_path):
                             #             clip_path = 'polygon(' + ', '.join(f'{point[0][0]}px {point[0][1]}px' for point in approx) + ')'
                             #     else:
 
-                            #         print('No contours found. Using padded rectangular clip-path.')
+                            #         log_to_stderr('No contours found. Using padded rectangular clip-path.')
                             #         clip_path = f'polygon({padding_x}px {padding_y}px, {width - padding_x}px {padding_y}px, {width - padding_x}px {height - padding_y}px, {padding_x}px {height - padding_y}px)'
 
                             #     cv2.imwrite('edges_debug.jpg', edges)
-                            #     print('Edge image saved as edges_debug.jpg for debugging')
+                            #     log_to_stderr('Edge image saved as edges_debug.jpg for debugging')
 
                             #     os.remove(image_path)
-                            #     print(f'CSS clip-path: {clip_path}')
+                            #     log_to_stderr(f'CSS clip-path: {clip_path}')
                             #     return clip_path
                                 
                             # getRightPath = extract_clip_path(image_path)    
-                            # print(f"here is right path of shape: {getRightPath}")
+                            # log_to_stderr(f"here is right path of shape: {getRightPath}")
 
 
 
                             # doc_width = psd.width
                             # doc_height = psd.height
-                            # print(f"PSD size: {doc_width}x{doc_height}px")
+                            # log_to_stderr(f"PSD size: {doc_width}x{doc_height}px")
 
                             # def get_shape_points(layer):
                             #     if layer.kind == 'shape' and hasattr(layer, 'vector_mask') and layer.vector_mask is not None:
@@ -561,12 +580,12 @@ def convert_psd_to_html(zip_path):
                             #         bbox_left, bbox_top, bbox_right, bbox_bottom = bbox
                             #         bbox_width = bbox_right - bbox_left
                             #         bbox_height = bbox_bottom - bbox_top
-                            #         print(f"Layer bbox: left={bbox_left}, top={bbox_top}, width={bbox_width}, height={bbox_height}")
+                            #         log_to_stderr(f"Layer bbox: left={bbox_left}, top={bbox_top}, width={bbox_width}, height={bbox_height}")
 
                             #         # Get vector mask points
                             #         vector_mask = layer.vector_mask
                             #         raw_points = [(knot.anchor[0], knot.anchor[1]) for path in vector_mask.paths for knot in path]
-                            #         print("Raw points:", raw_points)
+                            #         log_to_stderr("Raw points:", raw_points)
 
                             #         # Stretch X to full bbox width
                             #         min_x_raw = min(x for x, _ in raw_points)
@@ -581,7 +600,7 @@ def convert_psd_to_html(zip_path):
                             #             scaled_y = bbox_top + (y * bbox_height)
                             #             points.append((scaled_x, scaled_y))
                                     
-                            #         print("Scaled points:", points)
+                            #         log_to_stderr("Scaled points:", points)
 
                             #         # For "shape 1", manually adjust to match the image (wider at bottom)
                             #         if layer.name == "shape 1":
@@ -598,7 +617,7 @@ def convert_psd_to_html(zip_path):
                             #                 (bottom_right_x, bbox_bottom), # Bottom-right
                             #                 (top_right_x, bbox_top)      # Top-right
                             #             ]
-                            #             print("Adjusted points for shape 1:", points)
+                            #             log_to_stderr("Adjusted points for shape 1:", points)
 
                             #         return points
                             #     return None
@@ -610,24 +629,24 @@ def convert_psd_to_html(zip_path):
                             # # Process all layers
                             # points = get_shape_points(layer)
                             # if points:
-                            #     print(f"\nLayer: {layer.name}")
-                            #     print("Final points:", points)
+                            #     log_to_stderr(f"\nLayer: {layer.name}")
+                            #     log_to_stderr("Final points:", points)
                             #     clip_path = points_to_clip_path(points)
-                            #     print("CSS clip-path:", clip_path)
+                            #     log_to_stderr("CSS clip-path:", clip_path)
                             #     min_x = min(p[0] for p in points)
                             #     max_x = max(p[0] for p in points)
-                            #     print(f"Shape width: {max_x - min_x:.2f}px")
+                            #     log_to_stderr(f"Shape width: {max_x - min_x:.2f}px")
                             # # Try bounding box if vector mask isn't right
-                            # print("\nUsing bounding box:")
+                            # log_to_stderr("\nUsing bounding box:")
                             # points = get_shape_points(layer)
                             # if points:
-                            #     print(f"Layer: {layer.name}")
-                            #     print("Scaled points:", points)
+                            #     log_to_stderr(f"Layer: {layer.name}")
+                            #     log_to_stderr("Scaled points:", points)
                             #     clip_path = points_to_clip_path(points)
-                            #     print("CSS clip-path:", clip_path)
+                            #     log_to_stderr("CSS clip-path:", clip_path)
                             #     min_x = min(p[0] for p in points)
                             #     max_x = max(p[0] for p in points)
-                            #     print(f"Shape width: {max_x - min_x:.2f}px")
+                            #     log_to_stderr(f"Shape width: {max_x - min_x:.2f}px")
 
                             css_content.append(f"""
                             .shape{shapeCounts} {{
@@ -666,25 +685,25 @@ def convert_psd_to_html(zip_path):
                     #     image_path = f"output/{file_name_t}/images/{sanitized_name}.png"
                     #     try:
                     #         image.save(image_path)
-                    #         print(f"Saved image for {layer.name} at {image_path}")
+                    #         log_to_stderr(f"Saved image for {layer.name} at {image_path}")
                     #     except Exception as e:
-                    #         print(f"Failed to save image for {layer.name}: {e}")
+                    #         log_to_stderr(f"Failed to save image for {layer.name}: {e}")
                     # elif "imageHero2" in layer.name:
                     #     image_path = f"output/{file_name_t}/images/{sanitized_name}.png"
                     #     try:
                     #         image.save(image_path)
-                    #         print(f"Saved image for {layer.name} at {image_path}")
+                    #         log_to_stderr(f"Saved image for {layer.name} at {image_path}")
                     #     except Exception as e:
-                    #         print(f"Failed to save image for {layer.name}: {e}")
+                    #         log_to_stderr(f"Failed to save image for {layer.name}: {e}")
                     # elif "imageHero3" in layer.name:
                     #     image_path = f"output/{file_name_t}/images/{sanitized_name}.png"
                     #     try:
                     #         image.save(image_path)
-                    #         print(f"Saved image for {layer.name} at {image_path}")
+                    #         log_to_stderr(f"Saved image for {layer.name} at {image_path}")
                     #     except Exception as e:
-                    #         print(f"Failed to save image for {layer.name}: {e}")        
+                    #         log_to_stderr(f"Failed to save image for {layer.name}: {e}")        
 
-                    print(f"Processed: {sanitized_name}")
+                    log_to_stderr(f"Processed: {sanitized_name}")
                 
                 elif layer.is_group():
                     incre = cSubheading = 1
@@ -695,15 +714,15 @@ def convert_psd_to_html(zip_path):
                     countersOne = 1
                     countersTwo = 1
                     idxImageTwo = idxImageOne = 1
-                    print(f"Skipping group: {layer.name}")
+                    log_to_stderr(f"Skipping group: {layer.name}")
                     for pp in reversed(layer):
                         # if layer.kind == "shape":
                         #     continue
                         if hasattr(pp, 'kind') and pp.kind == 'type':
-                            print(f"Text layer found: {pp.name}")
+                            log_to_stderr(f"Text layer found: {pp.name}")
                             if hasattr(pp, 'text') and pp.text:
                                 text_content = pp.text.replace('', ' ')
-                                print(f"Text content found: {text_content}")
+                                log_to_stderr(f"Text content found: {text_content}")
                                 if hasattr(pp, 'engine_dict'):
                                     engine_data = pp.engine_dict
                                     if hasattr(pp, 'transform'):
@@ -723,8 +742,8 @@ def convert_psd_to_html(zip_path):
                                             font_sized = f'{scaled_font_size_x:.2f}'
                                             
                                             line_height_font = engine_data['StyleRun'].get('RunArray', [{}])[0].get('StyleSheet', {}).get('StyleSheetData', {}).get('Leading', None)
-                                            # print(engine_data['StyleRun'].get('RunArray', [{}])[0].get('StyleSheet', {}).get('StyleSheetData', {}))
-                                            # print(f"checking of this : {line_height_font}")
+                                            # log_to_stderr(engine_data['StyleRun'].get('RunArray', [{}])[0].get('StyleSheet', {}).get('StyleSheetData', {}))
+                                            # log_to_stderr(f"checking of this : {line_height_font}")
                                             if float(font_size_points) * 1.2 < line_height_font: 
                                                 line_height_points = font_size_points * 1.2
                                             else:
@@ -741,7 +760,7 @@ def convert_psd_to_html(zip_path):
 
                                             # LineHeightstyle_data = engine_data['StyleRun'].get('RunArray', [{}])[0].get('StyleSheet', {}).get('StyleSheetData', {})
                                             # line_height = LineHeightstyle_data.get('Leading', None)
-                                            # # print(f"line height data {LineHeightstyle_data}")
+                                            # # log_to_stderr(f"line height data {LineHeightstyle_data}")
                                             # try:
                                             #     line_height = float(line_height) if line_height and isinstance(line_height, (int, float, str)) and str(line_height).replace('.', '', 1).isdigit() else None
                                             # except (ValueError, TypeError):
@@ -760,9 +779,9 @@ def convert_psd_to_html(zip_path):
                                             # scaled_line_height = max(scaled_line_height, float(font_sized) * 1.0)
                                             # line_height_em = scaled_line_height / float(font_sized)
 
-                                            # print(f"DEBUG: Font Size: {font_sized}, Raw Leading: {line_height}, "
+                                            # log_to_stderr(f"DEBUG: Font Size: {font_sized}, Raw Leading: {line_height}, "
                                             # f"Scaled X: {scaled_line_height_x}, Scaled Y: {scaled_line_height_y}, Line Height EM: {line_height_em:.3f}")
-                                            # print(f"Layer: {pp.name}, Line Height: {effective_line_height:.5f} px, {line_height_em:.3f} em")
+                                            # log_to_stderr(f"Layer: {pp.name}, Line Height: {effective_line_height:.5f} px, {line_height_em:.3f} em")
                                         
                                         if 'StyleRun' in engine_data:
                                             center = pp.engine_dict['StyleRun']
@@ -806,13 +825,13 @@ def convert_psd_to_html(zip_path):
                                             family, font_weight_name, weight_value, type_font = extract_font_weight(fontsGet)
 
                                     except Exception as e:
-                                        print(f"Error accessing engine dict data: {e}")
+                                        log_to_stderr(f"Error accessing engine dict data: {e}")
                                 
                                 else:
-                                    print("Engine dict not available.")
+                                    log_to_stderr("Engine dict not available.")
                             
                         else:
-                            print("This is not a text layer.")
+                            log_to_stderr("This is not a text layer.")
 
 
                         # process_layer(pp, html_content, css_content)
@@ -842,7 +861,7 @@ def convert_psd_to_html(zip_path):
 
                         if "contactWrap" in layer.name:
                             shapeWrap =  ' id="sd_bgcolor_Contact-Background"'
-                            print(f"newww: {pp.name}")
+                            log_to_stderr(f"newww: {pp.name}")
                             if "contactBackground" in pp.name:
                                 contentBgx1, contentBgy1, contentBgx2, contentBgy2 = pp.bbox
                                 contentBgWidth = contentBgx2 - contentBgx1
@@ -975,7 +994,7 @@ def convert_psd_to_html(zip_path):
                             animateCr += 4; animateCrOut += 4
 
                         if "hero" in layer.name and "hero 2" not in layer.name:
-                            print(f"Processing hero layer: {layer.name}")
+                            log_to_stderr(f"Processing hero layer: {layer.name}")
                             cssImage = None
                             check = None
                             clip_paths = []
@@ -997,7 +1016,7 @@ def convert_psd_to_html(zip_path):
                                                         elif not isinstance(wrapp_image, Image.Image):
                                                             raise TypeError(f"topil() returned invalid type: {type(wrapp_image)}")
                                                     except Exception as e:
-                                                        print(f"topil() failed: {e}")
+                                                        log_to_stderr(f"topil() failed: {e}")
                                                         clip_path = "inherit"
 
                                                     if wrapp_image:
@@ -1006,9 +1025,9 @@ def convert_psd_to_html(zip_path):
                                                         try:
                                                             wrapp_image.save(image_path, "PNG")
                                                             file_size = os.path.getsize(image_path)
-                                                            print(f"Saved image to {image_path} (Size: {file_size} bytes)")
+                                                            log_to_stderr(f"Saved image to {image_path} (Size: {file_size} bytes)")
                                                         except Exception as e:
-                                                            print(f"Failed to save image to {image_path}: {e}")
+                                                            log_to_stderr(f"Failed to save image to {image_path}: {e}")
                                                             clip_path = "inherit"
                                                             image_path = None
 
@@ -1018,7 +1037,7 @@ def convert_psd_to_html(zip_path):
                                                                 clip_path = "inherit"
                                         
                                 if "imageWrap1" in child_layer.name or "imageWrap" in child_layer.name or "imageBorder" in child_layer.name:
-                                    print(f"skipping shape: {child_layer.name}")
+                                    log_to_stderr(f"skipping shape: {child_layer.name}")
                                     check = child_layer.name
                                     if "imageBorder" not in check:
                                         x1, y1, x2, y2 = child_layer.bbox
@@ -1026,7 +1045,7 @@ def convert_psd_to_html(zip_path):
                                         height = y2 - y1
                                     continue
                                 if pp.kind not in ['pixel', 'smartobject']:
-                                    print(f"no pixel")
+                                    log_to_stderr(f"no pixel")
                                     continue
                                 if pp.is_visible():
                                     imgx1, imgy1, imgx2, imgy2 = child_layer.bbox
@@ -1051,7 +1070,7 @@ def convert_psd_to_html(zip_path):
                                         cropped_image.save(image_path, "JPEG", quality=98, optimize=True)
 
                                     except Exception as e:
-                                        print(f"Failed to save image for {child_layer.name}: {e}")
+                                        log_to_stderr(f"Failed to save image for {child_layer.name}: {e}")
 
                             if countersOne == 1 or countersOne == 2 or countersOne == 3:
                                 HeroAnimation = f" animate_fadeIn delay_{HeroAnimateOne}s"
@@ -1099,11 +1118,11 @@ def convert_psd_to_html(zip_path):
                                     }}
                                 """)
                             HeroAnimateOne += 4    
-                            print(f"Processed image: {sanitized_name}")
+                            log_to_stderr(f"Processed image: {sanitized_name}")
 
                     
                         if "hero 2" in layer.name:
-                            print(f"Processing hero layer: {layer.name}")
+                            log_to_stderr(f"Processing hero layer: {layer.name}")
                             cssImage = None
                             check = None
                             for idx, child_layer in enumerate(reversed(layer), start=1):
@@ -1126,7 +1145,7 @@ def convert_psd_to_html(zip_path):
                                                         elif not isinstance(wrapp_image, Image.Image):
                                                             raise TypeError(f"topil() returned invalid type: {type(wrapp_image)}")
                                                     except Exception as e:
-                                                        print(f"topil() failed: {e}")
+                                                        log_to_stderr(f"topil() failed: {e}")
                                                         clip_path = "inherit"
 
                                                     if wrapp_image:
@@ -1135,9 +1154,9 @@ def convert_psd_to_html(zip_path):
                                                         try:
                                                             wrapp_image.save(image_path, "PNG")
                                                             file_size = os.path.getsize(image_path)
-                                                            print(f"Saved image to {image_path} (Size: {file_size} bytes)")
+                                                            log_to_stderr(f"Saved image to {image_path} (Size: {file_size} bytes)")
                                                         except Exception as e:
-                                                            print(f"Failed to save image to {image_path}: {e}")
+                                                            log_to_stderr(f"Failed to save image to {image_path}: {e}")
                                                             clip_path = "inherit"
                                                             image_path = None
 
@@ -1149,7 +1168,7 @@ def convert_psd_to_html(zip_path):
 
 
                                 if "imageWrap1" in child_layer.name or "imageWrap" in child_layer.name or "imageBorder" in child_layer.name:
-                                    print(f"skipping shape: {child_layer.name}")
+                                    log_to_stderr(f"skipping shape: {child_layer.name}")
                                     check = child_layer.name
                                     if "imageBorder" not in check:
                                         x1, y1, x2, y2 = child_layer.bbox
@@ -1157,7 +1176,7 @@ def convert_psd_to_html(zip_path):
                                         height = y2 - y1
                                     continue
                                 if pp.kind not in ['pixel', 'smartobject']:
-                                    print(f"no pixel")
+                                    log_to_stderr(f"no pixel")
                                     continue
                                 if pp.is_visible():
                                     imgx1, imgy1, imgx2, imgy2 = child_layer.bbox
@@ -1181,7 +1200,7 @@ def convert_psd_to_html(zip_path):
                                             cropped_image = cropped_image.convert("RGB")
                                         cropped_image.save(image_path, "JPEG", quality=98, optimize=True)
                                     except Exception as e:
-                                        print(f"Failed to save image for {child_layer.name}: {e}")
+                                        log_to_stderr(f"Failed to save image for {child_layer.name}: {e}")
     
                             if countersTwo == 1 or countersTwo == 2 or countersTwo == 3:
                                 HeroAnimationTwo = f" animate_fadeIn delay_{HeroAnimateTwo}_5s"
@@ -1227,7 +1246,7 @@ def convert_psd_to_html(zip_path):
                                     }}
                                 """)
                             HeroAnimateTwo += 4    
-                            print(f"Processed image: {sanitized_name}")
+                            log_to_stderr(f"Processed image: {sanitized_name}")
 
                                     
                         if "cta" in pp.name:
@@ -1236,19 +1255,19 @@ def convert_psd_to_html(zip_path):
 
                                 # def get_border_radius(layer, rendered_width=None, rendered_height=None):
                                 #     if not pp.has_vector_mask():
-                                #         print("No vector mask found")
+                                #         log_to_stderr("No vector mask found")
                                 #         return None
                                     
                                 #     vector_mask = pp.vector_mask
                                     
                                 #     width = rendered_width if rendered_width is not None else pp.width
                                 #     height = rendered_height if rendered_height is not None else pp.height
-                                #     # print(f"Using width: {width}px, height: {height}px") print(f"Number of paths: {len(vector_mask.paths)}")
+                                #     # log_to_stderr(f"Using width: {width}px, height: {height}px") log_to_stderr(f"Number of paths: {len(vector_mask.paths)}")
                                     
                                 #     radii_px = []
                                     
                                 #     for path in vector_mask.paths:
-                                #         # print(f"Processing path: {path}")print(f"Type of path: {type(path)}")print(f"Number of knots: {len(path)}")
+                                #         # log_to_stderr(f"Processing path: {path}")log_to_stderr(f"Type of path: {type(path)}")log_to_stderr(f"Number of knots: {len(path)}")
                                         
                                 #         for i in range(len(path)):
                                 #             knot1 = path[i]
@@ -1259,7 +1278,7 @@ def convert_psd_to_html(zip_path):
                                 #             preceding2 = knot2.preceding
                                             
                                 #             if leaving1 != anchor1 or preceding2 != anchor2:
-                                #                 print(f"Found curved segment between {anchor1} and {anchor2}")
+                                #                 log_to_stderr(f"Found curved segment between {anchor1} and {anchor2}")
                                 #                 dx = anchor2[0] - anchor1[0]
                                 #                 dy = anchor2[1] - anchor1[1]
 
@@ -1267,20 +1286,20 @@ def convert_psd_to_html(zip_path):
                                 #                 r_px = d_px / math.sqrt(2) 
                                 #                 radii_px.append(r_px)
                                 #             else:
-                                #                 print(f"Straight segment between {anchor1} and {anchor2}")
+                                #                 log_to_stderr(f"Straight segment between {anchor1} and {anchor2}")
                                     
                                 #     if radii_px:
                                 #         avg_radius = sum(radii_px) / len(radii_px)
                                 #         return avg_radius
                                 #     else:
-                                #         print("No curved segments found")
+                                #         log_to_stderr("No curved segments found")
                                 #         return None
 
                                 # rendered_width = psd.width
                                 # rendered_height = psd.height 
                                 # border_radius = get_border_radius(pp, rendered_width=rendered_width, rendered_height=rendered_height)
                                 # if border_radius is not None:
-                                #     print(f"Border Radius: {border_radius:.2f}px")
+                                #     log_to_stderr(f"Border Radius: {border_radius:.2f}px")
                                 #     radiusGet = f'{border_radius:.2f}'
                                 #     # base_font_size = 16
                                 #     # rad_em = float(radiusGet) / base_font_size
@@ -1295,7 +1314,7 @@ def convert_psd_to_html(zip_path):
                                 #         )
                                 #         for knot in subpath
                                 #     ]
-                                #     print(f"Anchors for subpath: {anchors}")
+                                #     log_to_stderr(f"Anchors for subpath: {anchors}")
 
                                 # Getting path data and radius
                                 # WIDTH_PX = width
@@ -1324,7 +1343,7 @@ def convert_psd_to_html(zip_path):
                                 #                 # Apply scale
                                 #                 scale_factor = 2
                                 #                 border_radius_px_corrected = border_radius_px * scale_factor
-                                #                 print(f"Corrected Border Radius: {border_radius_px_corrected:.2f}px")
+                                #                 log_to_stderr(f"Corrected Border Radius: {border_radius_px_corrected:.2f}px")
                                 #                 break
 
 
@@ -1400,10 +1419,10 @@ def convert_psd_to_html(zip_path):
                         #     content_html_app.append(f'<div class="contactWrap animate_fadeIn delay_0s"><div class="contactText" id="sd_txta-text">')
                         #     content_html_app.append(f'{text_content}')
                         #     content_html_app.append('</div></div>')
-                        #     print(f"gettting {pp}")
+                        #     log_to_stderr(f"gettting {pp}")
                         #     if pp.kind == 'type':
                         #         wws, hhs = get_text_layer_dimensions(pp)
-                        #         print(f"sTexts: {pp} Width: {wws}px, Height: {hhs}px")
+                        #         log_to_stderr(f"sTexts: {pp} Width: {wws}px, Height: {hhs}px")
                         #     css_content.append(f"""
                         #     .contactWrap {{
                         #         width: {width}px;
@@ -1428,9 +1447,9 @@ def convert_psd_to_html(zip_path):
                         
                     #     if hasattr(child_layer, 'text') and child_layer.text:
                     #         text_content = child_layer.text
-                    #         print(f"Text content found: {text_content}")
+                    #         log_to_stderr(f"Text content found: {text_content}")
                 else:
-                    print(f"Skipping unsupported layer: {layer.name}")
+                    log_to_stderr(f"Skipping unsupported layer: {layer.name}")
 
 
             for layer in psd:
@@ -1439,9 +1458,9 @@ def convert_psd_to_html(zip_path):
                 if layer.name == "bg":
                     color = get_layer_color(layer)
                     if color:
-                        print(f"backgroundColor has color: {color}")
+                        log_to_stderr(f"backgroundColor has color: {color}")
                     else:
-                        print("backgroundColor has no color.") 
+                        log_to_stderr("backgroundColor has no color.") 
 
 
                 html_content = ['<!DOCTYPE html>',
@@ -1549,35 +1568,34 @@ def convert_psd_to_html(zip_path):
             with open(f'{output_dir}/css/style.css', 'w') as f:
                 f.write("\n".join(css_content))
 
-            print("HTML and CSS files generated.")
+            log_to_stderr("HTML and CSS files generated.")
 
             # except Exception as e:
-            #     print(f"Error processing file '{file_name}': {e}")    
+            #     log_to_stderr(f"Error processing file '{file_name}': {e}")    
                         
             # Write HTML to a file in the output directory
             # html_path = os.path.join(output_dir, f"{file_name_t}.html")
             # with open(html_path, 'w') as f:
             #     f.write("\n".join(html_content))
 
-        # Create a zip file with all HTML files
-        output_zip_path = os.path.join(temp_dir, "converted_html.zip")
-        with zipfile.ZipFile(output_zip_path, 'w', zipfile.ZIP_DEFLATED) as output_zip:
-            for html_file in os.listdir(output_dir):
-                html_file_path = os.path.join(output_dir, html_file)
-                output_zip.write(html_file_path, html_file)
+            # Create a zip file with all HTML files
+            with open(f'{output_dir}/index.html', 'w', encoding='utf-8') as f:
+                f.write("\n".join(html_content))
 
-        # Read the zip file content to return it
-        with open(output_zip_path, 'rb') as f:
-            zip_content = f.read()
+            with open(f'{output_dir}/css/style.css', 'w', encoding='utf-8') as f:
+                f.write("\n".join(css_content))
 
-    # Return the binary zip content (Next.js will handle it)
-    return zip_content
+            log_to_stderr(f"HTML and CSS files generated for {psd_file}")  # Changed to log_to_stderr
+            results[psd_file] = {"success": True, "html": "\n".join(html_content)}
+
+    return {"success": True, "results": results}
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Error: Please provide a file path", file=sys.stderr)
+        log_to_stderr("Usage: python convert_psd.py <zip_file_path>")
+        print(json.dumps({"success": False, "error": "Usage: python convert_psd.py <zip_file_path>"}))
         sys.exit(1)
     
     file_path = sys.argv[1]
-    zip_content = convert_psd_to_html(file_path)
-    sys.stdout.buffer.write(zip_content)  # Output binary zip content to stdout
+    result = convert_psd_to_html(file_path)
+    print(json.dumps(result))  # Ensure only JSON is printed to stdout
