@@ -3,6 +3,7 @@
   publish = ".next"
   environment = { NODE_VERSION = "18" }
   functions = "netlify/functions"
+  publish = "dist"    
   
 [build.environment]
   PYTHON_VERSION = "3.9"

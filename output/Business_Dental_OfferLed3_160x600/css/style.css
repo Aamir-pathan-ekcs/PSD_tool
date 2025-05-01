@@ -1,0 +1,163 @@
+* {
+                        margin: 0px;
+                        padding: 0px;
+                        box-sizing: border-box;
+                    }
+
+                    :root {
+                        --width: 160px;
+                        --height: 600px;
+                    }
+                    
+
+                    .container {
+                        width: 160px;
+                        height: 600px;
+                        position: relative;
+                        overflow: hidden;
+                        border: 1px solid #7a8599;
+                        background-color: rgb(50, 124, 229);
+                    }
+                    
+   .clicktru {
+                        z-index:9999; width:100%; height:100%; position:absolute;
+                    }
+
+                        a{
+                            text-decoration:none;
+                    } 
+
+                        #sd_btn_Click-Through-URL:empty{display:none;} 
+                    
+
+                        .contentSection {
+                            width: 160px;
+                            height: 347px;
+                            position: relative;
+                            left: 0px;
+                            top: 252px;
+                            overflow: hidden;
+                        }
+                                    
+
+                            .shape2 {
+                                width: 257px;
+                                height: 3px;
+                                position: absolute;
+                                left: -49px;
+                                top: 127px;
+                                background-color: rgb(255, 255, 255, 255);
+                                border-radius: initial;
+                                clip-path: None;
+                                -webkit-clip-path: None
+                            
+                            }
+                                        
+
+                            .shape1 {
+                                width: 258px;
+                                height: 122px;
+                                position: absolute;
+                                left: -49px;
+                                top: 0px;
+                                background-color: rgb(243, 255, 255, 255);
+                                border-radius: initial;
+                                clip-path: None;
+                                -webkit-clip-path: None
+                            
+                            }
+                                        
+
+                                    .imageBox {
+                                        width: 144px;
+                                        height: 144px;
+                                        position: absolute;
+                                        left: 7px;
+                                        top: 15px;
+                                        z-index: 1;
+                                        overflow: hidden;
+                                        border-radius: initial;
+                                        clip-path: None;
+                                        -webkit-clip-path: None
+                                    }
+                                    .imageBox img {
+                                        width: 144px;
+                                        height: 144px;
+                                        object-fit: cover;
+                                    }
+                                
+.cta {
+    width: 159px;
+    display: flex;
+    position: absolute;
+    left: 0px;
+    top: 183px;
+    justify-content: center;
+}
+.button {
+    min-width: 124px;
+    max-width: 127.20px;
+    max-height: 34px;
+    font-size: 14.17px;
+    font-family: 'Montserrat', serif;
+    font-weight: 600;
+    font-style: normal;
+    cursor: pointer;
+    color: rgb(0, 0, 0);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(229, 242, 252);
+    padding: 0.5em 0.65em 0.51em;
+    text-align: center;
+    line-height: 1.2em;
+    border-radius: 0.00em;
+}
+
+                                .subHeading1,.subHeading2,.subHeading3 {
+                                    width: 131px;
+                                    height: 121px;
+                                    position: absolute;
+                                    left: 14px;
+                                    top: 47px;
+                                    font-family: 'Montserrat', serif;
+                                    font-weight: 600;
+                                    font-style: normal;
+                                    font-size: 14.08px;
+                                    color: rgb(244, 244, 244);
+                                    line-height: 1.11em;
+                                    text-align: center;
+                                }
+                                        
+
+                                .mainHeading {
+                                    width: 111px;
+                                    height: 191px;
+                                    position: absolute;
+                                    left: 25px;
+                                    top: 53px;
+                                    font-family: 'Montserrat', serif;
+                                    font-weight: 700;
+                                    font-style: normal;
+                                    font-size: 29.90px;
+                                    color: rgb(255, 255, 255);
+                                    line-height: 1.11em;
+                                    text-align: center;
+                                }
+                                        
+
+                            .logo {
+                                width: 138px;
+                                height: 72px;
+                                position: absolute;
+                                left: 10px;
+                                top: 169px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                            }
+                            .logo img{
+                                max-width: 138px;
+                                max-height: 72px;
+                            }
+                            

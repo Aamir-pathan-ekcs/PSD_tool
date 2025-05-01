@@ -14,6 +14,7 @@ import tempfile
 import shutil
 import json
 import warnings
+import base64
 
 def log_to_stderr(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)  # Use print directly, no recursion
@@ -1569,24 +1570,16 @@ def convert_psd_to_html(zip_path):
                 f.write("\n".join(css_content))
 
             log_to_stderr("HTML and CSS files generated.")
+            html = "\n".join(html_content)
+            css = "\n".join(css_content)
 
-            # except Exception as e:
-            #     log_to_stderr(f"Error processing file '{file_name}': {e}")    
-                        
-            # Write HTML to a file in the output directory
-            # html_path = os.path.join(output_dir, f"{file_name_t}.html")
-            # with open(html_path, 'w') as f:
-            #     f.write("\n".join(html_content))
-
-            # Create a zip file with all HTML files
-            with open(f'{output_dir}/index.html', 'w', encoding='utf-8') as f:
-                f.write("\n".join(html_content))
-
-            with open(f'{output_dir}/css/style.css', 'w', encoding='utf-8') as f:
-                f.write("\n".join(css_content))
-
-            log_to_stderr(f"HTML and CSS files generated for {psd_file}")  # Changed to log_to_stderr
-            results[psd_file] = {"success": True, "html": "\n".join(html_content)}
+            # Store results without overwriting
+            results[psd_file] = {
+                "success": True,
+                "html": html,
+                "css": css
+            }
+            log_to_stderr(f"Processed PSD: {psd_file} with HTML, CSS, and images")
 
     return {"success": True, "results": results}
 

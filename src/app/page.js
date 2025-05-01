@@ -10,23 +10,14 @@ export default function Home() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [htmlFiles, setHtmlFiles] = useState({});
+  const [previews, setPreviews] = useState([]);
   const [dimensions, setDimensions] = useState({});
   const [htmlDocs, setHtmlDocs] = useState([]);
   const fileInputRef = useRef(null);
   const [sessionId, setSessionId] = useState(null);
   const router = useRouter();
 
-  // Initialize sessionId on client side
-  useEffect(() => {
-    const storedSessionId = typeof window !== "undefined" ? localStorage.getItem("sessionId") : null;
-    if (!storedSessionId) {
-      const newSessionId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-      if (typeof window !== "undefined") localStorage.setItem("sessionId", newSessionId);
-      setSessionId(newSessionId);
-    } else {
-      setSessionId(storedSessionId);
-    }
-  }, []);
+
 
   // Fetch HTML files from Firestore
   useEffect(() => {
@@ -93,64 +84,105 @@ export default function Home() {
     setFile(e.target.files[0]);
     setError("");
   };
-  async function handleUpload(e) {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-    setHtmlDocs([]);
+  const handleUpload = async (event) => {
+    event.preventDefault();
+    if (!file) return;
 
-    if (!fileInputRef.current) {
-      setError("File input element not found. Please refresh the page.");
-      setIsLoading(false);
-      console.error("fileInputRef.current is null");
-      return;
-    }
-
-    const file = fileInputRef.current.files[0];
-    if (!file) {
-      setError("Please select a file to upload.");
-      setIsLoading(false);
-      return;
-    }
-
-    const sessionId = Date.now().toString();
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("sessionId", sessionId);
+    formData.append("sessionId", sessionId || Date.now().toString());
 
     try {
-      console.log("Uploading file:", file.name);
       const response = await fetch("/api/convert-psd", {
         method: "POST",
         body: formData,
-        signal: AbortSignal.timeout(120000), // Increased timeout to 60 seconds
       });
 
-      const responseText = await response.text();
-      console.log("API Response (raw):", responseText);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Upload failed");
 
-      if (!response.ok) {
-        let errorData;
-        try {
-          errorData = JSON.parse(responseText);
-          console.log("API Response (parsed error):", errorData);
-        } catch (parseError) {
-          console.error("Failed to parse API response as JSON:", parseError);
-          throw new Error(`API error: ${responseText}`);
-        }
-        throw new Error(`API error: ${errorData.error || "Unknown error"}`);
-      }
-
-      const data = JSON.parse(responseText);
-      console.log("API Response (success):", data);
-      setHtmlDocs(data.results || []);
+      setSessionId(data.results[0]?.filename.split("_")[0]);
+      fetchPreviews();
     } catch (err) {
       console.error("Error uploading file:", err);
       setError(err.message);
-    } finally {
-      setIsLoading(false);
     }
-  }
+  };
+
+  const fetchPreviews = async () => {
+    if (!sessionId) return;
+
+    try {
+      const response = await fetch(`/api/preview?sessionId=${sessionId}`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Fetch failed");
+
+      setPreviews(data.previews);
+    } catch (err) {
+      console.error("Error fetching previews:", err);
+      setError(err.message);
+    }
+  };
+
+  const handleDownload = (zipBase64, filename) => {
+    const binaryString = atob(zipBase64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const blob = new Blob([bytes], { type: "application/zip" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${filename}.zip`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const getPreviewHtml = (preview) => {
+    // Decode HTML from base64
+    let htmlContent = atob(preview.htmlBase64);
+
+    // Replace image URLs with data URLs
+    let modifiedHtml = htmlContent;
+    const imageBase64s = preview.imageBase64s || {};
+
+    // Find all image src attributes to debug missing images
+    const imgSrcRegex = /src=["'](.*?)["']/g;
+    let match;
+    while ((match = imgSrcRegex.exec(htmlContent)) !== null) {
+      const src = match[1];
+      if (src.startsWith("images/")) {
+        const imgName = src.replace("images/", "");
+        if (imageBase64s[imgName]) {
+          const imgDataUrl = `data:image/${imgName.split('.').pop()};base64,${imageBase64s[imgName]}`;
+          modifiedHtml = modifiedHtml.replace(new RegExp(src, 'g'), imgDataUrl);
+        } else {
+          console.warn(`Image not found in imageBase64s: ${imgName}`);
+        }
+      }
+    }
+
+    // Replace CSS URL with inline style tag
+    if (preview.cssBase64) {
+      const cssContent = atob(preview.cssBase64);
+      modifiedHtml = modifiedHtml.replace(
+        /<link rel="stylesheet" href="\.\/css\/style\.css" \/>/,
+        `<style>${cssContent}</style>`
+      );
+    } else {
+      console.warn("No CSS found in preview.cssBase64");
+    }
+
+    return modifiedHtml;
+  };
+
+  useEffect(() => {
+    if (sessionId) fetchPreviews();
+  }, [sessionId]);
   // const handleUpload = async () => {
   //   if (!file || !sessionId) {
   //     setError("Please select a file first or wait for session initialization!");
@@ -265,17 +297,38 @@ export default function Home() {
       <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>PSD to HTML Converter</h1>
       <div style={{ marginBottom: "20px" }}>
     <div>
+    <div>
       <form onSubmit={handleUpload}>
         <input
           type="file"
-          ref={fileInputRef} // Ensure the ref is correctly assigned
           accept=".zip"
-          required // Optional: Ensures a file must be selected
+          onChange={(e) => setFile(e.target.files[0])}
         />
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? "Uploading..." : "Upload"}
-        </button>
+        <button type="submit">Upload</button>
       </form>
+      {error && <p style={{ color: "red" }}>Error: {error}</p>}
+      <h2>Previews</h2>
+      {previews.length > 0 ? (
+        previews.map((preview) => (
+          <div key={preview.id} style={{ margin: "20px 0", border: "1px solid #ccc", padding: "10px" }}>
+            <h3>{preview.filename}</h3>
+            <div style={{ position: "relative", overflow: "hidden", maxWidth: "100%" }}>
+              <iframe
+                srcDoc={getPreviewHtml(preview)}
+                title={preview.filename}
+                style={{ width: "100%", height: "600px", border: "none" }}
+                sandbox="allow-scripts"
+              />
+            </div>
+            <button onClick={() => handleDownload(preview.zipBase64, preview.filename)}>
+              Download Package
+            </button>
+          </div>
+        ))
+      ) : (
+        <p>No previews available. Upload a file to generate one.</p>
+      )}
+    </div>
       {error && <p style={{ color: "red" }}>{error}</p>}
       {htmlDocs.length > 0 && (
         <div>

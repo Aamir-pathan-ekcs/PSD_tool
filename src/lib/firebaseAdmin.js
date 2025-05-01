@@ -1,5 +1,6 @@
-import { initializeApp, cert } from "firebase-admin/app";
+import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { getStorage } from "firebase-admin/storage";
 
 const serviceAccount = {
   projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
@@ -13,7 +14,8 @@ console.log("Env vars:", {
   clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
 });
 
-const app = initializeApp({
+const apps = getApps();
+const app = apps.length > 0 ? apps[0] : initializeApp({
   credential: cert(serviceAccount),
 });
 
